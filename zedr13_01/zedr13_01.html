@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR13_01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR13_01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  프로그램 작성 교육</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report ZEDR13_01</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT ZEDR13_01.
+
+
+    DATA : gs_data LIKE ZTEDU_13,
+    gt_data LIKE TABLE OF ZTEDU_13.
+
+    gs_data-GJAHR = '2017'.
+    gs_data-BUKRS = '1000'.
+    gs_data-BELNR = '23242'.
+    gs_data-DMBTR = 100.
+    gs_data-WAERS = 'EUR'.
+
+  APPEND gs_data TO gt_data.
+    CLEAR gs_data.
+
+
+    gs_data-GJAHR = '2017'.
+
+    gs_data-BELNR = '23234'.
+
+    gs_data-WAERS = 'EUR'.
+
+  APPEND gs_data TO gt_data.
+    CLEAR gs_data.
+
+
+
+    gs_data-GJAHR = '2017'.
+    gs_data-BUKRS = '1000'.
+    gs_data-DMBTR = 300.
+
+  APPEND gs_data TO gt_data.
+    CLEAR gs_data.
+
+    gs_data-GJAHR = '2017'.
+    gs_data-BUKRS = '1000'.
+    gs_data-BELNR = '52242'.
+
+    APPEND gs_data TO gt_data.
+    CLEAR gs_data.
+
+
+
+LOOP AT gt_data INTO gs_data.
+WRITE :
+gs_data-GJAHR,
+gs_data-BUKRS,
+gs_data-BELNR,
+gs_data-DMBTR,
+gs_data-WAERS,/.
+ENDLOOP.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>
