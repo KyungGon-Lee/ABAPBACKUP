@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR13_27</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR13_27</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  ALV CBO모드 STANDARD모드 선택</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report  ZEDR13_27</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+include <a href ="zedr13_27top.html">ZEDR13_27TOP</a>.    " global Data
+
+ include <a href ="zedr13_27scr.html">ZEDR13_27scr</a>.
+ include <a href ="zedr13_27o01.html">ZEDR13_27O01</a>.  " PBO-Modules
+ include <a href ="zedr13_27i01.html">ZEDR13_27I01</a>.  " PAI-Modules
+ include <a href ="zedr13_27f01.html">ZEDR13_27F01</a>.  " FORM-Routines
+
+ START-OF-SELECTION.
+
+
+ CASE 'X'.
+ 	WHEN p_stan.
+ PERFORM get_data2.
+ 	WHEN p_cbo.
+ PERFORM get_data.
+ ENDCASE.
+
+
+ CALL SCREEN '0100'.
+
+<font color ="#0000FF">*GUI Texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* 0100 --&gt; ALV 스탠다드조회 CBO 조회 선택</font>
+
+
+<font color ="#0000FF">*Selection texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* P_CBO         CBO 모드</font>
+<font color ="#0000FF">* P_STAN         STANDARD 모드</font>
+<font color ="#0000FF">* S_MATNR D       .</font>
+
+
+<font color ="#0000FF">*Messages</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: OO</font>
+<font color ="#0000FF">*000   & & & &</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

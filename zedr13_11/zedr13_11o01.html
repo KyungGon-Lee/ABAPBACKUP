@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR13_11O01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR13_11O01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZEDR13_11O01</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZEDR13_11O01</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+MODULE status_0100 OUTPUT.
+  SET PF-STATUS '0100'.   " '   ' 안에는 스크린 번호와 동일하게 해준다. 어느 스크린 꺼인지 알기 위해
+  SET TITLEBAR '0100'.    " '   ' 안에는 스크린 번호와 동일하게 해준다. 어느 스크린 꺼인지 알기 위해
+ENDMODULE.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  CREATE_SCREEN  OUTPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+MODULE create_screen OUTPUT.
+  CREATE OBJECT go_container
+    EXPORTING
+      container_name = 'GO_CONTAINER'. " 아까 LAYOUT가서 그려준 이름과 동일하게 해줘야 한다.
+
+  CREATE OBJECT go_grid
+    EXPORTING
+      i_parent = go_container. "어떤 컨테이너에게 붙을 건지 알려준다. 위에서 CREATE OBJECT go_container로
+  "만들었기 때문에 그 컨테이너로 할당한다.
+
+  CALL METHOD go_grid-&gt;set_table_for_first_display
+    EXPORTING
+<font color ="#0000FF">*     i_buffer_active =</font>
+<font color ="#0000FF">*     i_bypassing_buffer            =</font>
+<font color ="#0000FF">*     i_consistency_check           =</font>
+<font color ="#0000FF">*     i_structure_name              = 'SFLIGHT'</font>
+      is_variant      = gs_variant
+<font color ="#0000FF">*     i_save          = 'X'</font>
+<font color ="#0000FF">*     i_default       = 'X'</font>
+      is_layout       = gs_layout
+<font color ="#0000FF">*     is_print        =</font>
+<font color ="#0000FF">*     it_special_groups             =</font>
+<font color ="#0000FF">*     it_toolbar_excluding          =</font>
+<font color ="#0000FF">*     it_hyperlink    =</font>
+<font color ="#0000FF">*     it_alv_graphics =</font>
+<font color ="#0000FF">*     it_except_qinfo =</font>
+<font color ="#0000FF">*     ir_salv_adapter =</font>
+    CHANGING
+      it_outtab       = gt_sflight[]
+      it_fieldcatalog = gt_fcat
+<font color ="#0000FF">*필드 카탈로그 넣어줌</font>
+<font color ="#0000FF">*     it_sort         =</font>
+<font color ="#0000FF">*     it_filter       =</font>
+<font color ="#0000FF">*    EXCEPTIONS</font>
+<font color ="#0000FF">*     invalid_parameter_combination = 1</font>
+<font color ="#0000FF">*     program_error   = 2</font>
+<font color ="#0000FF">*     too_many_lines  = 3</font>
+<font color ="#0000FF">*     others          = 4</font>
+    .
+  IF sy-subrc &lt;&gt; 0.
+<font color ="#0000FF">*   Implement suitable error handling here</font>
+  ENDIF.
+
+
+ENDMODULE.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  SET_FIELD  OUTPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+MODULE set_field OUTPUT.
+
+
+  CLEAR : gs_fcat, gt_fcat.
+
+  PERFORM set_fcat USING :
+        'X'   'CARRID'    'Airline'           'SFLIGHT' 'CARRID',
+        'X'   'CONNID'    'Flight Number'     'SFLIGHT' 'CONNID',
+        'X'   'FLDATE'    'Date'              'SFLIGHT' 'FLDATE',
+        ' '   'PRICE'     'Airfare'           'SFLIGHT' 'PRICE',
+        ' '   'CURRENCY'  'Airline Currency'  'SFLIGHT' 'CURRENCY',
+        ' '   'PLANETYPE' 'Plane Type'        'SFLIGHT' 'PLANETYPE',
+        ' ' 'SEATSMAX'   'Maximum capacity in economy class'  'SFLIGHT'  'SEATSMAX',
+        ' ' 'SEATSOCC'   'Occupied seats in economy class'    'SFLIGHT'  'SEATSOCC',
+        ' ' 'PAYMENTSUM' 'Total of current bookings'          'SFLIGHT'  'PAYMENTSUM'.
+
+
+
+
+
+<font color ="#0000FF">* 아래에 있는건 꼭 넣을필요는 없고 현업이 요구를 할 떄에만 하면</font>
+
+<font color ="#0000FF">*  gs_layout-no_rowmark   = 'X'.  " 제일 왼쪽에 선택할 수 있는 row마크를 없애 준다.</font>
+  gs_layout-sel_mode     = 'D'. " 제일 왼쪽에 선택할 수 있도록 row 마크를 만들어줌. 값으로 A, B, C, D 가능.
+  " D 일때는 다중선택이 가능하다. A 일때는 다중 선택 불가능.
+  gs_layout-smalltitle   = 'X'. " grid_title의 크기를 작게 만든다.
+  gs_layout-zebra        = 'X'. " grid화면을 얼룩말 처럼 색깔이 번갈아 가며 나오게 설정한다.
+  gs_layout-grid_title   = 'Sflight List'. "ALV의 제목을 설정한다.
+  gs_layout-cwidth_opt   = 'X'. "필드의 길이를 가장 긴 데이터를 기준으로 맞춰서 보여준다.
+  " 대용량의 데이터일 경우 속도가 느리므로 사용하지 않는 것이 좋다.
+
+  gs_variant-report      = sy-repid. "sy-repid는 ZEDR23_03(현재 프로그램)의 ID이다.
+  "gs_variant-report에 이 값을 넣어주면 내가 원하는 layout형태를 저장할 수 있다.
+ENDMODULE.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

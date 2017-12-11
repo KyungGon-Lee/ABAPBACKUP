@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZPPG0320_13</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZPPG0320_13</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  CREATE MATERIAL MASTER</b></font>
+<hr>
+<pre width="100">
+REPORT ZPPG0320_13 MESSAGE-ID ZPPGM.
+
+include <a href ="zppg0320_13_top.html">ZPPG0320_13_TOP</a>.    " global Data
+
+include <a href ="zppg0320_13_o01.html">ZPPG0320_13_O01</a>.  " PBO-Modules
+include <a href ="zppg0320_13_i01.html">ZPPG0320_13_I01</a>.  " PAI-Modules
+include <a href ="zppg0320_13_f01.html">ZPPG0320_13_F01</a>.
+
+INITIALIZATION.
+PERFORM DO_INIT.
+
+START-OF-SELECTION.
+  PERFORM GET_DATA_SCREEN200.
+  PERFORM UPLOAD_DATA.
+  PERFORM MODIFY_GT_DATA.
+
+  IF GT_DATA[] IS INITIAL. " 이니셜 실패할 경우
+    MESSAGE S001 WITH 'DATA NOT FOUND' DISPLAY LIKE 'E'. "성공한형식인데 에러 형식으로 해서 시스템 안꺼지게 함
+    ELSE.
+    CALL SCREEN '0100'.
+  ENDIF.
+
+<font color ="#0000FF">*GUI Texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* T0100 --&gt; CREATE MATERIAL MASTER</font>
+<font color ="#0000FF">* T0200 --&gt; Field Infomation</font>
+
+<font color ="#0000FF">*Text elements</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* F01 Template Download</font>
+<font color ="#0000FF">* F02 View and Field</font>
+
+
+<font color ="#0000FF">*Selection texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* P_PATHS D       .</font>
+
+
+<font color ="#0000FF">*Messages</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: ZPPGM</font>
+<font color ="#0000FF">*001</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

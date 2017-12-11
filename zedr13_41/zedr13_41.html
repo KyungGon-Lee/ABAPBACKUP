@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR13_41</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR13_41</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  BKPF 텍스트 조회</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report  ZEDR13_41</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+include <a href ="zedr13_41top.html">ZEDR13_41TOP</a>.    " global Data
+
+ include <a href ="zedr13_41scr.html">ZEDR13_41SCR</a>.
+ include <a href ="zedr13_41o01.html">ZEDR13_41O01</a>.  " PBO-Modules
+ include <a href ="zedr13_41i01.html">ZEDR13_41I01</a>.  " PAI-Modules
+ include <a href ="zedr13_41f01.html">ZEDR13_41F01</a>.  " FORM-Routines
+
+START-OF-SELECTION.
+PERFORM get_data.
+PERFORM display_screen.
+
+
+<font color ="#0000FF">*Selection texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* S_BLART D       .</font>
+<font color ="#0000FF">* S_BUKRS D       .</font>
+<font color ="#0000FF">* S_GJAHR D       .</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

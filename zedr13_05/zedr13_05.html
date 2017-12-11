@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR13_05</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR13_05</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Program ZEDR13_05</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report ZEDR13_05</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT zedr13_05.
+
+<font color ="#0000FF">*TABLES : sflight.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*SELECTION-SCREEN BEGIN OF BLOCK bl1 WITH FRAME TITLE text-001.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  SELECT-OPTIONS : s_carrid FOR sflight-carrid,</font>
+<font color ="#0000FF">*                   s_connid FOR sflight-connid.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  PARAMETERS : p_pltype LIKE sflight-planetype.</font>
+<font color ="#0000FF">*  SELECTION-SCREEN END OF BLOCK bl1.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  RANGES : gr_pltype FOR sflight-planetype,</font>
+<font color ="#0000FF">*           gr_curr FOR sflight-currency.</font>
+<font color ="#0000FF">**ranges는 TABLES에 영향을 안받음</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  DATA : gt_sflight TYPE TABLE OF sflight WITH HEADER LINE.</font>
+<font color ="#0000FF">*  CLEAR : gt_sflight, gt_sflight[], gr_pltype, gr_pltype[],</font>
+<font color ="#0000FF">*          gr_curr, gr_curr[].</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*IF p_pltype IS NOT INITIAL.</font>
+<font color ="#0000FF">**  IF p_pltype NE space.</font>
+<font color ="#0000FF">*    gr_pltype-sign = 'I'.</font>
+<font color ="#0000FF">*    gr_pltype-option = 'EQ'.</font>
+<font color ="#0000FF">*    gr_pltype-low = p_pltype.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    APPEND gr_pltype.</font>
+<font color ="#0000FF">*    CLEAR gr_pltype.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    ENDIF.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  SELECT carrid connid fldate planetype currency price</font>
+<font color ="#0000FF">*    INTO CORRESPONDING FIELDS OF TABLE gt_sflight</font>
+<font color ="#0000FF">*    FROM sflight</font>
+<font color ="#0000FF">*    WHERE carrid IN s_carrid</font>
+<font color ="#0000FF">*    AND connid IN s_connid</font>
+<font color ="#0000FF">*    AND planetype in gr_pltype.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    IF sy-subrc EQ 0.</font>
+<font color ="#0000FF">*      LOOP AT gt_sflight.</font>
+<font color ="#0000FF">*        WRITE : gt_sflight-carrid, gt_sflight-connid, gt_sflight-planetype,/.</font>
+<font color ="#0000FF">*        ENDLOOP.</font>
+<font color ="#0000FF">*        ENDIF.</font>
+
+<font color ="#0000FF">*----------------------------------------------------------------------------</font>
+<font color ="#0000FF">*        TABLES : MARA.</font>
+<font color ="#0000FF">** 셀렉옵션에서 테이블 쓰기 위해 (for쓰기 위해) 선언해주어야 함</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*        SELECTION-SCREEN BEGIN OF BLOCK bl2 WITH FRAME TITLE text-002.</font>
+<font color ="#0000FF">*          SELECT-OPTIONS : s_MATNR FOR MARA-MATNR,</font>
+<font color ="#0000FF">** s는 셀렉트 옵션즈에서 네이밍 룰 셀렉트 옵션을 마라에있는 matnr을 참조</font>
+<font color ="#0000FF">*                           s_MTART FOR MARA-MTART.</font>
+<font color ="#0000FF">*        PARAMETERS : p_werks LIKE marc-werks.</font>
+<font color ="#0000FF">** 파라미터 werks를 marc에있는 werks 형식으로 함</font>
+<font color ="#0000FF">*        SELECTION-SCREEN END OF BLOCK bl2.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*        RANGES : gr_werks FOR marc-werks.</font>
+<font color ="#0000FF">** 레인지는 파라미터를 셀렉트 옵션즈 처럼 사용하기 위해 선언해줌</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">** 인터널 테이블을 마라랑 마씨랑 같이 포함하는 구조로 새로 만듬</font>
+<font color ="#0000FF">*        DATA : BEGIN OF gt_data OCCURS 0,</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*          MATNR LIKE MARA-MATNR,</font>
+<font color ="#0000FF">*          WERKS LIKE MARC-WERKS,</font>
+<font color ="#0000FF">*          MTART LIKE MARA-MTART,</font>
+<font color ="#0000FF">*          MATKL LIKE MARA-MATKL,</font>
+<font color ="#0000FF">*          MEINS LIKE MARA-MEINS,</font>
+<font color ="#0000FF">*          PSTAT LIKE MARC-PSTAT,</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*          END OF gt_data.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*          CLEAR : gt_data, gt_data[],gr_werks, gr_werks[].</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*          IF p_werks IS NOT INITIAL.</font>
+<font color ="#0000FF">*          gr_werks-sign = 'I'.</font>
+<font color ="#0000FF">*          gr_werks-option = 'EQ'.</font>
+<font color ="#0000FF">*          gr_werks-low = p_werks.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*          APPEND gr_werks.</font>
+<font color ="#0000FF">**바디에 데이터를 넣어주는거</font>
+<font color ="#0000FF">*          CLEAR gr_werks.</font>
+<font color ="#0000FF">**헤더를 지움</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*         ENDIF.</font>
+<font color ="#0000FF">** 레인지와 더불어 이프 문으로 이렇게 조건을 걸어줘야 셀렉션 옵션 처럼사용 가능</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">** 조인하는 과정인데 마라에 마씨를 넣어서 조인을 함</font>
+<font color ="#0000FF">** 검색 조건은 셀렉션 스크린에 넣은 값이랑 인터널 테이블에 들어있는 값이 같으면 봄</font>
+<font color ="#0000FF">** 그런데 값이 없으면 무시를하는데 무시하는 이유는 셀렉션 옵션은 값이 없을 경우 무시</font>
+<font color ="#0000FF">*         SELECT a~matnr b~werks a~mtart a~matkl a~meins b~pstat</font>
+<font color ="#0000FF">*           INTO CORRESPONDING FIELDS OF TABLE gt_data</font>
+<font color ="#0000FF">*           from mara AS a</font>
+<font color ="#0000FF">*           INNER JOIN marc AS b</font>
+<font color ="#0000FF">*           ON a~MATNR = b~MATNR</font>
+<font color ="#0000FF">*           WHERE a~mtart in s_mtart</font>
+<font color ="#0000FF">*           AND a~matnr in s_matnr</font>
+<font color ="#0000FF">*           AND b~werks in gr_werks.</font>
+<font color ="#0000FF">** 셀렉션 스크린에있는 matnr과 인터널 테이블에있는 matnr이 같을 경우</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*        IF sy-subrc EQ 0.</font>
+<font color ="#0000FF">** 루프를 돌려서 gt데이터에</font>
+<font color ="#0000FF">*         LOOP at gt_data.</font>
+<font color ="#0000FF">*         WRITE :</font>
+<font color ="#0000FF">*         gt_data-MATNR,</font>
+<font color ="#0000FF">*         gt_data-WERKS,</font>
+<font color ="#0000FF">*         gt_data-MTART,</font>
+<font color ="#0000FF">*         gt_data-MATKL,</font>
+<font color ="#0000FF">*         gt_data-MEINS,</font>
+<font color ="#0000FF">*         gt_data-PSTAT,/.</font>
+<font color ="#0000FF">*         ENDLOOP.</font>
+<font color ="#0000FF">*         ENDIF.</font>
+
+
+<font color ="#0000FF">*-------------------------------------------------------------------------</font>
+
+TABLES : scarr, sflight.
+
+SELECTION-SCREEN BEGIN OF BLOCK bl3 WITH FRAME TITLE TEXT-003.
+SELECT-OPTIONS : s_carrid FOR scarr-carrid OBLIGATORY,
+                 s_connid FOR sflight-connid NO INTERVALS.
+
+PARAMETERS : p_bookid LIKE sbook-bookid,
+             p_check  AS CHECKBOX,
+             p_rd1    RADIOBUTTON GROUP rb1,
+             p_rd2    RADIOBUTTON GROUP rb1,
+             p_rd3    RADIOBUTTON GROUP rb1.
+
+SELECTION-SCREEN END OF BLOCK bl3.
+
+CASE 'X'.
+  WHEN p_rd1.
+    WRITE : 'RD1'.
+  WHEN p_rd2.
+    WRITE : 'RD2'.
+  WHEN p_rd3.
+    WRITE : 'RD3'.
+ENDCASE.
+
+
+
+
+RANGES : gr_bookid FOR sbook-bookid.
+
+
+DATA : BEGIN OF gt_data OCCURS 0,
+
+         carrid   LIKE scarr-carrid,
+         connid   LIKE sflight-connid,
+         fldate   LIKE sflight-fldate,
+         bookid   LIKE sbook-bookid,
+         currency LIKE sflight-currency,
+         customid LIKE sbook-customid,
+         custtype LIKE sbook-custtype,
+         invoice  LIKE sbook-invoice,
+
+       END OF gt_data.
+
+
+
+CLEAR : gt_data, gt_data[],gr_bookid, gr_bookid[].
+
+IF p_bookid IS NOT INITIAL.
+  gr_bookid-sign = 'I'.
+  gr_bookid-option = 'EQ'.
+  gr_bookid-low = p_bookid.
+
+  APPEND gr_bookid.
+  CLEAR gr_bookid.
+
+ENDIF.
+
+SELECT a~carrid b~connid b~fldate c~bookid b~currency c~customid c~custtype c~invoice
+  INTO CORRESPONDING FIELDS OF TABLE gt_data
+  FROM scarr AS a
+  INNER JOIN sflight AS b
+  ON a~carrid = b~carrid
+  INNER JOIN sbook AS c
+  ON b~carrid = c~carrid
+  AND b~connid = c~connid
+  AND b~fldate = c~fldate
+  WHERE a~carrid IN s_carrid
+  AND b~connid IN s_connid
+  AND c~bookid IN gr_bookid.
+
+
+
+IF sy-subrc EQ 0.
+<font color ="#0000FF">* 조인에 성공했을때</font>
+  LOOP AT gt_data.
+    WRITE :
+    gt_data-carrid,
+    gt_data-connid,
+    gt_data-fldate,
+    gt_data-bookid,
+    gt_data-currency,
+    gt_data-customid,
+    gt_data-custtype,
+    gt_data-invoice,/.
+  ENDLOOP.
+
+ELSE.
+<font color ="#0000FF">* 데이터가 없을 경우</font>
+  WRITE : '데이터 없음'.
+
+ENDIF.
+
+
+<font color ="#0000FF">*Selection texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* P_BOOKID D       .</font>
+<font color ="#0000FF">* S_CARRID D       .</font>
+<font color ="#0000FF">* S_CONNID D       .</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR13_18CLS</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR13_18CLS</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZEDR13_18CLS</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZEDR13_18CLS</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class lcl_event_handler</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS lcl_event_handler DEFINITION.
+
+  PUBLIC SECTION.
+  METHODS : double_handle for event double_click
+  OF cl_gui_alv_grid
+  IMPORTING
+    E_ROW
+    E_COLUMN
+    ES_ROW_NO.
+
+<font color ="#0000FF">* 셀렉트문을 메소드화시키는 작업 carrid를 추가함</font>
+<font color ="#0000FF">*    get_sflight</font>
+<font color ="#0000FF">*    IMPORTING e_carrid TYPE sflight-carrid.</font>
+
+  ENDCLASS.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class (Implementation)  lcl_event_handler</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS lcl_event_handler IMPLEMENTATION.
+  METHOD :double_handle.
+    PERFORM double_handle USING E_ROW
+                                E_COLUMN
+                                ES_ROW_NO.
+    ENDMETHOD.
+
+<font color ="#0000FF">*    METHOD get_sflight.</font>
+<font color ="#0000FF">*      PERFORM get_sflight USING e_carrid.</font>
+<font color ="#0000FF">*      ENDMETHOD.</font>
+
+ENDCLASS.      "lcl_event_handler
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

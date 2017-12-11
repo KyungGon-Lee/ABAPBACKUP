@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZPPG0020_M01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZPPG0020_M01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZPPG0020_M01</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZPPG0020_M01</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  STATUS_0100  OUTPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+MODULE STATUS_0100 OUTPUT.
+
+  CLEAR: GT_EX_UCOMM, GT_EX_UCOMM[].
+
+<font color ="#0000FF">*  IF G_INPUT_MODE = 0.</font>
+<font color ="#0000FF">*    APPEND 'SAVE' TO GT_EX_UCOMM.</font>
+<font color ="#0000FF">*  ENDIF.</font>
+
+  SET PF-STATUS '0100' EXCLUDING GT_EX_UCOMM[].
+
+  DATA: L_TITLE TYPE SY-TITLE.
+  L_TITLE = SY-TITLE.
+  SET TITLEBAR  '0100' WITH L_TITLE.  "&
+
+ENDMODULE.                 " STATUS_0100  OUTPUT
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  EXIT_0100  INPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+MODULE EXIT_0100 INPUT.
+
+  CLEAR G_OKCD.
+  G_OKCD = G_UCOM.
+  CLEAR G_UCOM.
+
+  CASE G_OKCD.
+
+    WHEN 'BACK' OR 'EXIT' OR 'CANC'.
+      PERFORM ALV_CLEAR_0100.
+      LEAVE TO SCREEN 0.
+
+  ENDCASE.
+
+ENDMODULE.                 " EXIT_0100  INPUT
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  PBO_0100  OUTPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+MODULE PBO_0100 OUTPUT.
+
+  CHECK GO_CONT IS INITIAL.
+
+  CREATE OBJECT GO_CONT
+    EXPORTING
+      CONTAINER_NAME = 'GO_CONT'.
+
+  CREATE OBJECT GO_GRID
+    EXPORTING
+      I_PARENT = GO_CONT.
+
+<font color ="#0000FF">* 이벤트</font>
+  CREATE OBJECT GO_EVT_GRID
+    EXPORTING
+      E_OBJECT_TEXT = 'GO_GRID'.
+
+  SET HANDLER GO_EVT_GRID-&gt;HANDLE_TOOLBAR       FOR GO_GRID.
+  SET HANDLER GO_EVT_GRID-&gt;HANDLE_USER_COMMAND  FOR GO_GRID.
+  SET HANDLER GO_EVT_GRID-&gt;HANDLE_DOUBLE_CLICK  FOR GO_GRID.
+  SET HANDLER GO_EVT_GRID-&gt;HANDLE_HOTSPOT_CLICK FOR GO_GRID.
+  SET HANDLER GO_EVT_GRID-&gt;HANDLE_BUTTON_CLICK  FOR GO_GRID.
+  SET HANDLER GO_EVT_GRID-&gt;HANDLE_DATA_CHANGED  FOR GO_GRID.
+
+<font color ="#0000FF">* 툴바 버튼 제거</font>
+  PERFORM ALV_EX_TOOLBAR USING 'GT_EXCLUDE'.
+
+<font color ="#0000FF">* LAYOUT</font>
+  PERFORM ALV_LAYOUT_INIT USING '' '' CHANGING GS_LAYOUT.      "EDIT, COLOR
+
+<font color ="#0000FF">* FIELDCAT</font>
+  PERFORM ALV_FIELDCAT_MERGE TABLES GT_M GT_FCAT
+                             USING  'GT_M'.
+  PERFORM ALV_FIELDCAT_0100  TABLES GT_FCAT.
+
+<font color ="#0000FF">* SORT</font>
+  PERFORM ALV_SORT_0100 TABLES GT_SORT.
+
+<font color ="#0000FF">** Edit  이벤트 등록</font>
+<font color ="#0000FF">*  CALL METHOD GO_GRID-&gt;REGISTER_EDIT_EVENT</font>
+<font color ="#0000FF">*    EXPORTING</font>
+<font color ="#0000FF">*      I_EVENT_ID = CL_GUI_ALV_GRID=&gt;MC_EVT_MODIFIED.  "바로 수정</font>
+<font color ="#0000FF">*  CALL METHOD GO_GRID-&gt;SET_READY_FOR_INPUT  "디폴트가 1 이므로</font>
+<font color ="#0000FF">*    EXPORTING                               "안해도됨</font>
+<font color ="#0000FF">*      I_READY_FOR_INPUT = 1.</font>
+
+<font color ="#0000FF">* First Display</font>
+  CALL METHOD GO_GRID-&gt;SET_TABLE_FOR_FIRST_DISPLAY
+    EXPORTING
+      IS_LAYOUT            = GS_LAYOUT
+      IT_TOOLBAR_EXCLUDING = GT_EXCLUDE[]
+      I_DEFAULT            = ' '            "레이아웃 사전셋팅 허용안함
+      I_SAVE               = 'A'            "전체가능유형.
+      IS_VARIANT           = GS_VARIANT
+    CHANGING
+      IT_OUTTAB            = GT_M[]
+      IT_SORT              = GT_SORT[]
+      IT_FIELDCATALOG      = GT_FCAT[].
+
+ENDMODULE.                 " PBO_0100  OUTPUT
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  USER_COMMAND_0100  INPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+MODULE USER_COMMAND_0100 INPUT.
+
+  CLEAR G_OKCD.
+  G_OKCD = G_UCOM.
+  CLEAR G_UCOM.
+
+  CASE G_OKCD.
+
+    WHEN 'CHAN'.
+      PERFORM 0100_CHAN.
+      PERFORM DATA_COUNT.
+      PERFORM ALV_TABLE_REFRESH USING GO_GRID 'X' SPACE. "PEPSI
+    WHEN 'DELE'.
+      PERFORM 0100_DELE.
+      PERFORM ALV_TABLE_REFRESH USING GO_GRID 'X' SPACE. "PEPSI
+
+  ENDCASE.
+
+ENDMODULE.                 " USER_COMMAND_0100  INPUT
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

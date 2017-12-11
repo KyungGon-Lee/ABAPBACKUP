@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR_13_13TOP</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR_13_13TOP</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZEDR_13_13TOP</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Include ZEDR_13_13TOP                                     Report ZEDR13_13</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT zedr13_13.
+
+TABLES : mkpf.
+
+DATA : BEGIN OF gt_data OCCURS 0,
+<font color ="#0000FF">*WITH 헤더랑은 조금 다름</font>
+<font color ="#0000FF">* OCCURS 는 조인이 가능하고 필요한거만 가져옴</font>
+
+         MJAHR  LIKE MKPF-MJAHR,
+         MBLNR  LIKE MKPF-MBLNR,
+         BLART  LIKE MKPF-BLART,
+         BUDAT  LIKE MKPF-BUDAT,
+         ZEILE LIKE MSEG-ZEILE,
+         MATNR LIKE MSEG-MATNR,
+         WERKS LIKE MSEG-WERKS,
+         DMBTR LIKE MSEG-DMBTR,
+         WAERS LIKE MSEG-WAERS,
+         MENGE TYPE mseg-menge,
+         meins TYPE mseg-meins,
+       END OF gt_data.
+
+
+DATA : go_container TYPE REF TO cl_gui_custom_container,
+       go_grid      TYPE REF TO cl_gui_alv_grid,
+       gs_fcat      TYPE lvc_s_fcat,
+       gt_fcat      TYPE lvc_t_fcat,
+       gs_layout    TYPE lvc_s_layo,
+       gs_variant   TYPE disvariant.
+
+
+
+
+RANGES : gr_mjahr FOR mkpf-mjahr.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

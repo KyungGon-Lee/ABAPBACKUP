@@ -1,0 +1,1152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZPPG0020_CLS</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZPPG0020_CLS</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZPPG0020_CLS</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZPPG0020_CLS</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZLJW_ALV</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+DATA: GV_REPID LIKE SY-CPROG.
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* LOCAL CLASSES: Definition</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_EVENT_REC_GRID DEFINITION.
+
+  PUBLIC SECTION.
+
+    DATA: G_OBJECT_TEXT TYPE CHAR30.
+
+    METHODS: CONSTRUCTOR
+               IMPORTING E_OBJECT_TEXT TYPE C.
+
+    METHODS: HANDLE_DATA_CHANGED
+               FOR EVENT DATA_CHANGED OF CL_GUI_ALV_GRID
+               IMPORTING ER_DATA_CHANGED
+                         E_ONF4
+                         E_ONF4_BEFORE
+                         E_ONF4_AFTER
+                         E_UCOMM.
+
+    METHODS: HANDLE_DATA_CHANGED_FINISHED
+               FOR EVENT DATA_CHANGED_FINISHED OF CL_GUI_ALV_GRID
+               IMPORTING E_MODIFIED
+                         ET_GOOD_CELLS.
+
+    METHODS: HANDLE_DOUBLE_CLICK
+               FOR EVENT DOUBLE_CLICK OF CL_GUI_ALV_GRID
+               IMPORTING E_ROW
+                         E_COLUMN.
+
+    METHODS: HANDLE_HOTSPOT_CLICK
+             FOR EVENT HOTSPOT_CLICK OF CL_GUI_ALV_GRID
+             IMPORTING E_ROW_ID
+                       E_COLUMN_ID.
+
+    METHODS: PRINT_TOP_OF_PAGE
+             FOR EVENT PRINT_TOP_OF_PAGE OF CL_GUI_ALV_GRID.
+
+    METHODS: HANDLE_ON_F4
+               FOR EVENT ONF4 OF CL_GUI_ALV_GRID
+               IMPORTING SENDER
+                         E_FIELDNAME
+                         E_FIELDVALUE
+                         ES_ROW_NO
+                         ER_EVENT_DATA
+                         ET_BAD_CELLS
+                         E_DISPLAY.
+
+    METHODS: HANDLE_TOOLBAR
+               FOR EVENT TOOLBAR OF CL_GUI_ALV_GRID
+               IMPORTING E_OBJECT
+                         E_INTERACTIVE.
+
+    METHODS: HANDLE_BEFORE_USER_COMMAND
+               FOR EVENT BEFORE_USER_COMMAND OF CL_GUI_ALV_GRID
+               IMPORTING E_UCOMM.
+
+    METHODS: HANDLE_USER_COMMAND
+               FOR EVENT USER_COMMAND OF CL_GUI_ALV_GRID
+               IMPORTING E_UCOMM.
+
+    METHODS: HANDLE_AFTER_USER_COMMAND
+               FOR EVENT AFTER_USER_COMMAND OF CL_GUI_ALV_GRID
+               IMPORTING E_UCOMM
+                         E_SAVED
+                         E_NOT_PROCESSED.
+
+    METHODS: HANDLE_BUTTON_CLICK
+               FOR EVENT BUTTON_CLICK OF CL_GUI_ALV_GRID
+               IMPORTING ES_COL_ID
+                         ES_ROW_NO.
+
+    METHODS: HANDLE_CONTEXT_MENU
+               FOR EVENT CONTEXT_MENU_REQUEST OF CL_GUI_ALV_GRID
+               IMPORTING E_OBJECT.
+
+ENDCLASS.  "(LCL_EVENT_REC_GRID DEFINITION)
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* LOCAL CLASSES: Implementation</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_EVENT_REC_GRID IMPLEMENTATION.
+
+  METHOD CONSTRUCTOR.
+    CALL METHOD SUPER-&gt;CONSTRUCTOR.
+    G_OBJECT_TEXT = E_OBJECT_TEXT.
+  ENDMETHOD.                    "constructor
+
+  METHOD HANDLE_DATA_CHANGED.
+    PERFORM ALV_DATA_CHANGED IN PROGRAM (GV_REPID) IF FOUND
+                                  USING G_OBJECT_TEXT
+                                        ER_DATA_CHANGED
+                                        E_ONF4
+                                        E_ONF4_BEFORE
+                                        E_ONF4_AFTER
+                                        E_UCOMM.
+  ENDMETHOD.                    "handle_data_changed
+
+  METHOD HANDLE_DATA_CHANGED_FINISHED.
+    PERFORM ALV_DATA_CHANGED_FINISHED IN PROGRAM (GV_REPID) IF FOUND
+                                           USING G_OBJECT_TEXT
+                                                 E_MODIFIED
+                                                 ET_GOOD_CELLS.
+  ENDMETHOD.                    "HANDLE_DATA_CHANGED_FINISHED
+
+  METHOD HANDLE_DOUBLE_CLICK.
+    PERFORM ALV_DOUBLE_CLICK IN PROGRAM (GV_REPID) IF FOUND
+                                  USING G_OBJECT_TEXT
+                                        E_ROW
+                                        E_COLUMN.
+  ENDMETHOD.    "HANDLE_DOUBLE_CLICK
+
+  METHOD HANDLE_HOTSPOT_CLICK.
+    PERFORM ALV_DOUBLE_CLICK IN PROGRAM (GV_REPID) IF FOUND
+                                  USING G_OBJECT_TEXT
+                                        E_ROW_ID
+                                        E_COLUMN_ID.
+  ENDMETHOD.                    "HANDLE_HOTSPOT_CLICK
+
+  METHOD PRINT_TOP_OF_PAGE.
+    PERFORM ALV_TOP_OF_PAGE IN PROGRAM (GV_REPID) IF FOUND
+                                 USING G_OBJECT_TEXT.
+  ENDMETHOD.                    "print_top_of_page
+
+  METHOD HANDLE_ON_F4.
+    PERFORM ALV_ON_F4 IN PROGRAM (GV_REPID) IF FOUND
+                           USING G_OBJECT_TEXT
+                                 SENDER
+                                 E_FIELDNAME
+                                 E_FIELDVALUE
+                                 ES_ROW_NO
+                                 ER_EVENT_DATA
+                                 ET_BAD_CELLS
+                                 E_DISPLAY.
+  ENDMETHOD.                                                "on_f4
+
+  METHOD HANDLE_TOOLBAR.
+    PERFORM ALV_TOOLBAR IN PROGRAM (GV_REPID) IF FOUND
+                             USING G_OBJECT_TEXT
+                                   E_OBJECT
+                                   E_INTERACTIVE.
+  ENDMETHOD.                    "handle_toolbar
+
+  METHOD HANDLE_BEFORE_USER_COMMAND.
+    PERFORM ALV_BEFORE_USER_COMMAND IN PROGRAM (GV_REPID) IF FOUND
+                                         USING G_OBJECT_TEXT
+                                               E_UCOMM.
+  ENDMETHOD.                    "HANDLE_BEFORE_USER_COMMAND
+
+  METHOD HANDLE_USER_COMMAND.
+    PERFORM ALV_USER_COMMAND IN PROGRAM (GV_REPID) IF FOUND
+                                  USING G_OBJECT_TEXT
+                                        E_UCOMM.
+  ENDMETHOD.                    "HANDLE_USER_COMMAND
+
+  METHOD HANDLE_AFTER_USER_COMMAND.
+    PERFORM ALV_AFTER_USER_COMMAND IN PROGRAM (GV_REPID) IF FOUND
+                                        USING G_OBJECT_TEXT
+                                              E_UCOMM
+                                              E_SAVED
+                                              E_NOT_PROCESSED.
+  ENDMETHOD.                    "HANDLE_AFTER_USER_COMMAND
+
+  METHOD HANDLE_BUTTON_CLICK.
+    PERFORM ALV_BUTTON_CLICK IN PROGRAM (GV_REPID) IF FOUND
+                                  USING G_OBJECT_TEXT
+                                        ES_COL_ID
+                                        ES_ROW_NO.
+  ENDMETHOD.    "HANDLE_BUTTON_CLICK
+
+  METHOD HANDLE_CONTEXT_MENU.
+    PERFORM ALV_CONTEXT_MENU IN PROGRAM (GV_REPID) IF FOUND
+                                  USING G_OBJECT_TEXT
+                                        E_OBJECT.
+  ENDMETHOD.    "HANDLE_CONTEXT_MENU
+
+ENDCLASS. "LCL_EVENT_REC_GRID IMPLEMENTATION
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* ALV</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+DATA: GO_GUI_CONT      TYPE REF TO CL_GUI_CONTAINER,
+      GO_CONT          TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
+      GO_CONT1         TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
+      GO_CONT2         TYPE REF TO CL_GUI_CUSTOM_CONTAINER,
+      GO_DOCK          TYPE REF TO CL_GUI_DOCKING_CONTAINER,
+      GO_SPLT          TYPE REF TO CL_GUI_SPLITTER_CONTAINER,
+      GO_SPLT1         TYPE REF TO CL_GUI_SPLITTER_CONTAINER,
+      GO_SPCONT        TYPE REF TO CL_GUI_CONTAINER,
+      GO_SPCONT0       TYPE REF TO CL_GUI_CONTAINER,
+      GO_SPCONT1       TYPE REF TO CL_GUI_CONTAINER,
+      GO_SPCONT2       TYPE REF TO CL_GUI_CONTAINER,
+      GO_DOCUMENT      TYPE REF TO CL_DD_DOCUMENT,
+      GO_GRID          TYPE REF TO CL_GUI_ALV_GRID,
+      GO_GRID1         TYPE REF TO CL_GUI_ALV_GRID,
+      GO_GRID2         TYPE REF TO CL_GUI_ALV_GRID,
+      GO_EDITOR        TYPE REF TO CL_GUI_TEXTEDIT,
+      GO_EVT_GRID      TYPE REF TO LCL_EVENT_REC_GRID,
+      GS_LAYOUT        TYPE LVC_S_LAYO,
+      GS_LAYOUT1       TYPE LVC_S_LAYO,
+      GS_LAYOUT2       TYPE LVC_S_LAYO,
+      GT_FCAT          TYPE LVC_T_FCAT WITH HEADER LINE,
+      GT_FCAT1         TYPE LVC_T_FCAT WITH HEADER LINE,
+      GT_FCAT2         TYPE LVC_T_FCAT WITH HEADER LINE,
+      GT_SORT          TYPE LVC_T_SORT WITH HEADER LINE,
+      GT_SORT1         TYPE LVC_T_SORT WITH HEADER LINE,
+      GT_SORT2         TYPE LVC_T_SORT WITH HEADER LINE,
+      GT_ALV_F4        TYPE LVC_T_F4   WITH HEADER LINE,
+      GS_STABLE        TYPE LVC_S_STBL,
+      GS_VARIANT       TYPE DISVARIANT,
+      GT_EXCLUDE       TYPE UI_FUNCTIONS WITH HEADER LINE,
+      GT_EX_UCOMM      TYPE TABLE OF SY-UCOMM WITH HEADER LINE.
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_CELL_COLOR</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  CELL의 색깔을 지정한다</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_CELL_COLOR  USING    I_FNAME
+                              I_CODE          "300, 700
+                     CHANGING ET_CELLCOL TYPE LVC_T_SCOL.
+
+  DATA: LS_CELLCOL TYPE LVC_S_SCOL.
+
+  LS_CELLCOL-FNAME     = I_FNAME.
+  LS_CELLCOL-COLOR-COL = I_CODE(1).      "3
+  LS_CELLCOL-COLOR-INT = I_CODE+1(1).    "0
+  LS_CELLCOL-COLOR-INV = I_CODE+2(1).    "0
+  LS_CELLCOL-NOKEYCOL  = 'X'.               "기준색상 겹쳐쓰기
+
+  INSERT LS_CELLCOL INTO TABLE ET_CELLCOL.
+
+ENDFORM.                    " ALV_CELL_COLOR
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_CELL_EDIT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  CELL의 수정/조회 모드를 지정한다</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_CELL_EDIT USING    I_FNAME
+                            I_EN_DI_GB
+                   CHANGING ET_CELLTAB TYPE LVC_T_STYL.
+
+  DATA: LS_CELLTAB TYPE LVC_S_STYL.
+
+  LS_CELLTAB-FIELDNAME = I_FNAME.
+
+  CASE I_EN_DI_GB.
+    WHEN 'E'. LS_CELLTAB-STYLE = CL_GUI_ALV_GRID=&gt;MC_STYLE_ENABLED.
+    WHEN 'D'. LS_CELLTAB-STYLE = CL_GUI_ALV_GRID=&gt;MC_STYLE_DISABLED.
+  ENDCASE.
+
+  INSERT LS_CELLTAB INTO TABLE ET_CELLTAB[].
+
+ENDFORM.                    " ALV_CELL_EDIT
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_EX_TOOLBAR</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  툴바의 버튼중 나타내지 않을 버튼을 지정한다.</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_EX_TOOLBAR USING P_TB_NAME.
+
+  FIELD-SYMBOLS: &lt;TABLE&gt; TYPE UI_FUNCTIONS.
+
+  DATA: L_TB_NAME  LIKE FELD-NAME.
+
+  GV_REPID = SY-CPROG.
+
+  CONCATENATE P_TB_NAME '[]' INTO  L_TB_NAME.
+  ASSIGN     (L_TB_NAME)    TO &lt;TABLE&gt;.
+
+  REFRESH: &lt;TABLE&gt;.
+
+  PERFORM ALV_EXCLUDE_TB_1
+    TABLES &lt;TABLE&gt;
+<font color ="#0000FF">*   USING: CL_GUI_ALV_GRID=&gt;mc_fc_excl_all.      "툴바 모두제거</font>
+    USING:
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;mc_fc_detail,            "상세정보</font>
+      CL_GUI_ALV_GRID=&gt;MC_FC_REFRESH,           "Refresh
+      CL_GUI_ALV_GRID=&gt;MC_FC_CHECK,
+
+      CL_GUI_ALV_GRID=&gt;MC_FC_LOC_CUT,           "데이타 잘라내기
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_LOC_COPY,          "데이타 복사</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_MB_PASTE</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_LOC_PASTE,         "데이타 붙여넣기</font>
+      CL_GUI_ALV_GRID=&gt;MC_FC_LOC_PASTE_NEW_ROW, "Paste new Row
+      CL_GUI_ALV_GRID=&gt;MC_FC_LOC_UNDO,          "실행취소
+
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FG_EDIT,              "edit관련한 버튼을 모두 제거</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_LOC_APPEND_ROW,    "행 생성</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_LOC_INSERT_ROW,    "행 삽입</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_LOC_DELETE_ROW,    "행 삭제</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_LOC_COPY_ROW,      "행 카피</font>
+
+      CL_GUI_ALV_GRID=&gt;MC_FC_GRAPH,             "그래프
+      CL_GUI_ALV_GRID=&gt;MC_FC_INFO.              "Info
+
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_MB_VIEW,              "</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_VIEWS,             "리스트출력    '&VIEW'</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_VIEW_CRYSTAL,      "크리스탈보기</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_VIEW_EXCEL,        "엑셀보기</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_VIEW_GRID,         "Grid보기      '&VGRID'</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_VIEW_LOTUS.        "</font>
+
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_sort,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_sort_asc,          "Sort ASC</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_sort_dsc,          "Sort DESC</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_find,              "Find</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_find_more,         "Find Next</font>
+
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;MC_MB_FILTER,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_filter,            "Set 필터</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_delete_filter,     "Del 필터</font>
+
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_sum,               "Sum</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_subtot,            "Sub Sum</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_minimum,           "Min</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_maximum,           "Max</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;MC_FC_AVERAGE,           "평균</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_auf,               "소계확장&AUF</font>
+
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_print,             "프린트</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_print_back,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_print_prev,</font>
+
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;MC_MB_EXPORT,            "</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_data_save,         "Export</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_word_processor,    "워드</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_pc_file,           "로컬파일</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_send,              "Send</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_to_office,         "Office</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_call_abc,          "ABC분석</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_html,              "HTML</font>
+
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_load_variant,      "불러오기</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_current_variant,   "현재</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_save_variant,      "저장</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_maintain_variant,  "Vari관리</font>
+
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_col_optimize,      "Optimize</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_separator,         "분리자</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_select_all,        "전체선택</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_deselect_all,      "전체해제</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_col_invisible,     "칼럼숨기기</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_fix_columns,       "칼럼고정</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_unfix_columns,     "칼럼고정풀기</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_average,           "Average         '&AVERAGE'</font>
+
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_f4,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_help,</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_CALL_ABC,          "               '&ABC'</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_call_chain,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_back_classic,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_call_crbatch,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_call_crweb,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_call_lineitems,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_call_master_data,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_call_more,</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_CALL_REPORT,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_call_xint,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_call_xxl,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_expcrdata,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_expcrdesig,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_expcrtempl,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_expmdb,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_extend,</font>
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_loc_move_row,</font>
+
+<font color ="#0000FF">*      cl_gui_alv_grid=&gt;mc_fc_reprep,</font>
+<font color ="#0000FF">*      CL_GUI_ALV_GRID=&gt;MC_FC_TO_REP_TREE.</font>
+
+ENDFORM.                    " ALV_EX_TOOLBAR
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_EX_TOOLBAR_NO</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  툴바의 버튼중 나타내지 않을 버튼을 지정한다.</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_EX_TOOLBAR_NO USING P_TB_NAME.
+
+  FIELD-SYMBOLS: &lt;TABLE&gt; TYPE UI_FUNCTIONS.
+
+  DATA: L_TB_NAME  LIKE FELD-NAME.
+
+  GV_REPID = SY-CPROG.
+
+  CONCATENATE P_TB_NAME '[]' INTO  L_TB_NAME.
+  ASSIGN     (L_TB_NAME)    TO &lt;TABLE&gt;.
+
+  REFRESH: &lt;TABLE&gt;.
+
+  PERFORM ALV_EXCLUDE_TB_1
+    TABLES &lt;TABLE&gt;
+    USING  CL_GUI_ALV_GRID=&gt;MC_FC_EXCL_ALL.      "툴바 모두제거
+
+ENDFORM.                    " ALV_EX_TOOLBAR_NO
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_EXCLUDE_TB_1</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_EXCLUDE_TB_1  TABLES   PT_EX TYPE UI_FUNCTIONS
+                       USING    PV_VALUE.
+
+  DATA: LS_EXCLUDE TYPE UI_FUNC.
+
+  LS_EXCLUDE = PV_VALUE.
+  APPEND LS_EXCLUDE TO PT_EX.
+
+ENDFORM.                    " ALV_EXCLUDE_TB_1
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_EXEC_TOOLBAR_FCODE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  툴바 메뉴를 실행시킨다</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_EXEC_TOOLBAR_FCODE USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+                                  P_LVC_FCODE.
+
+  DATA: L_SLIS_FCODE LIKE SY-UCOMM.
+
+<font color ="#0000FF">*  P_LVC_FCODE = '&PRINT_BACK_PREVIEW'.   " '&RNT'  '%SC' '&PRINT_BACK_PREVIEW' '&VIEW'</font>
+
+  CALL METHOD CL_GUI_ALV_GRID=&gt;TRANSFER_FCODE_LVC_TO_SLIS
+    EXPORTING
+<font color ="#0000FF">*      IT_FCODES_LVC  =</font>
+      I_FCODE_LVC    = P_LVC_FCODE
+    IMPORTING
+<font color ="#0000FF">*      ET_FCODES_SLIS =</font>
+      E_FCODE_SLIS   = L_SLIS_FCODE
+    EXCEPTIONS
+       NO_MATCH_FOUND = 1
+       OTHERS         = 2          .
+
+  IF SY-SUBRC &lt;&gt; 0.
+    MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+       WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+  CALL METHOD PO_GRID-&gt;SET_FUNCTION_CODE
+    CHANGING
+      C_UCOMM = L_SLIS_FCODE.
+
+
+ENDFORM.                    " ALV_EXEC_TOOLBAR_FCODE
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_FIELDCAT_MERGE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_FIELDCAT_MERGE TABLES PT_M     TYPE TABLE
+                               PT_FCAT  TYPE LVC_T_FCAT
+                        USING  P_IT_NAME.
+
+  CLEAR: PT_FCAT, PT_FCAT[].
+
+  DATA: LT_FCAT     TYPE SLIS_T_FIELDCAT_ALV WITH HEADER LINE.
+  DATA: LV_IT_NAME  TYPE SLIS_TABNAME.
+
+  GV_REPID   = SY-CPROG.
+  LV_IT_NAME = P_IT_NAME.
+
+<font color ="#0000FF">* IT 구조를 가져오기 위해</font>
+  CALL FUNCTION 'REUSE_ALV_FIELDCATALOG_MERGE'
+    EXPORTING
+      I_PROGRAM_NAME     = GV_REPID
+      I_INTERNAL_TABNAME = LV_IT_NAME
+      I_INCLNAME         = GV_REPID
+<font color ="#0000FF">*     I_BYPASSING_BUFFER = ' '</font>
+    CHANGING
+      CT_FIELDCAT        = LT_FCAT[].
+
+<font color ="#0000FF">* ALV GRID용으로 변환</font>
+  CALL FUNCTION 'LVC_TRANSFER_FROM_SLIS'
+    EXPORTING
+      IT_FIELDCAT_ALV = LT_FCAT[]
+    IMPORTING
+      ET_FIELDCAT_LVC = PT_FCAT[]
+    TABLES
+      IT_DATA         = PT_M.
+
+ENDFORM.                    " ALV_FIELDCAT_MERGE
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_FCAT_MERGE_LVC</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_FCAT_MERGE_LVC TABLES PT_FIELDCAT TYPE LVC_T_FCAT
+                        USING  P_STR_NAME.
+
+  GV_REPID = SY-CPROG.
+
+  CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
+    EXPORTING
+<font color ="#0000FF">*     I_BUFFER_ACTIVE              =</font>
+      I_STRUCTURE_NAME             = P_STR_NAME
+<font color ="#0000FF">*     I_CLIENT_NEVER_DISPLAY       = 'X'</font>
+<font color ="#0000FF">*     I_BYPASSING_BUFFER           =</font>
+<font color ="#0000FF">*     I_INTERNAL_TABNAME           =</font>
+    CHANGING
+      CT_FIELDCAT                  = PT_FIELDCAT[]
+    EXCEPTIONS
+     INCONSISTENT_INTERFACE       = 1
+     PROGRAM_ERROR                = 2
+     OTHERS                       = 3            .
+
+  IF SY-SUBRC &lt;&gt; 0.
+    MESSAGE ID SY-MSGID TYPE 'I' NUMBER SY-MSGNO DISPLAY LIKE SY-MSGTY
+       WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+ENDFORM.                    " ALV_FCAT_MERGE_LVC
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_GET_CURSOR</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_GET_CURSOR USING    PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+                    CHANGING P_ROW_ID    "LVC_S_ROW-INDEX
+                             P_COL_NM.   "LVC_S_COL-FIELDNAME
+
+  DATA: L_ROW TYPE I,
+        L_VALUE(255),
+        L_COL TYPE I,
+        LS_ROW TYPE LVC_S_ROW,
+        LS_COL TYPE LVC_S_COL,
+        LS_ROW_NO TYPE LVC_S_ROID.
+
+  CLEAR: P_ROW_ID, P_COL_NM.
+
+  CALL METHOD PO_GRID-&gt;GET_CURRENT_CELL
+    IMPORTING
+      E_ROW     = L_ROW
+      E_VALUE   = L_VALUE
+      E_COL     = L_COL
+      ES_ROW_ID = LS_ROW
+      ES_COL_ID = LS_COL
+      ES_ROW_NO = LS_ROW_NO.
+
+  IF LS_ROW-ROWTYPE IS INITIAL.
+    P_ROW_ID = LS_ROW-INDEX.
+  ENDIF.
+
+  P_COL_NM = LS_COL-FIELDNAME.
+
+ENDFORM.                    " ALV_GET_CURSOR
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_LAYOUT_INIT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_LAYOUT_INIT USING    P_EDIT    "수정모드 사용여부
+                              P_COLOR   "색깔셋팅 사용여부
+                     CHANGING PS_LAYOUT TYPE LVC_S_LAYO.
+
+  CLEAR PS_LAYOUT.
+
+  PS_LAYOUT-DETAILINIT = 'X'.        "Detail값이 NULL이라도 보여줌
+  PS_LAYOUT-SEL_MODE   = 'D'.        "CELL 선택 모드
+  PS_LAYOUT-NO_ROWINS  = 'X'.
+  PS_LAYOUT-NO_ROWMOVE = 'X'.
+  PS_LAYOUT-SMALLTITLE = 'X'.
+  PS_LAYOUT-FRONTEND   = 'X'.        "ALV 제어: 엑셀 또는 크리스털 또는 ALV
+
+  IF P_EDIT = 'X'.
+    PS_LAYOUT-STYLEFNAME = 'CELLTAB'.  "Input/Output 셋팅
+  ENDIF.
+
+  IF P_COLOR = 'X'.
+    PS_LAYOUT-CTAB_FNAME = 'CELLCOL'.  "Color 셋팅
+  ENDIF.
+
+  PS_LAYOUT-INFO_FNAME = 'ROW_COLOR'.  "라인의 색깔
+
+  GS_VARIANT-REPORT    = SY-CPROG.     "Default Variant Set
+
+<font color ="#0000FF">*  PS_LAYOUT-EDIT       = 'X'.         "전체 수정가능하게</font>
+<font color ="#0000FF">*  PS_LAYOUT-ZEBRA      = 'X'.         "한라인씩 진하게,여리게 반전, SORT하면 하지 않는게 좋다.</font>
+<font color ="#0000FF">*  PS_LAYOUT-NO_TOOLBAR = 'X'.</font>
+<font color ="#0000FF">*  PS_LAYOUT-GRID_TITLE = 'GRID 제목'.</font>
+<font color ="#0000FF">*  PS_LAYOUT-NO_ROWMARK = 'X'.        "MARK 없이(수정모드이면 작동안함)</font>
+<font color ="#0000FF">*  PS_LAYOUT-SEL_MODE   = 'A'.        "CELL 선택 모드(수정모드이면 작동안함)</font>
+<font color ="#0000FF">*  PS_LAYOUT-SEL_MODE   = 'B'.        "LINE 선택 모드(수정모드이면 작동안함, NO_ROWMARK = ''이어야함)</font>
+<font color ="#0000FF">*  PS_LAYOUT-SEL_MODE   = 'C'.        "LINE 선택 모드(Multi 라인 선택가능)</font>
+<font color ="#0000FF">*  PS_LAYOUT-SEL_MODE   = 'D'.        "CELL 선택 모드</font>
+
+ENDFORM.                    " ALV_LAYOUT_INIT
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_REFRESH</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  P_GB = ' ' : REFRESH 만 수행</font>
+<font color ="#0000FF">*         'F' : Fieldcat 길이가 변경에 대한 수행</font>
+<font color ="#0000FF">*         'S' : Sort, SUMMARY 에 대한 REFRESH 수행</font>
+<font color ="#0000FF">*         'A' : Fieldcat 길이 + Sort, SUMMARY 수행</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_REFRESH USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+                       PT_FCAT TYPE LVC_T_FCAT
+                       P_GB.
+
+  IF PO_GRID IS INITIAL. EXIT. ENDIF.
+
+  DATA: LS_STBL TYPE LVC_S_STBL,
+        L_SOFT_REFRESH.
+
+<font color ="#0000FF">* Fieldcat 길이가 변경되거나 하였을 경우</font>
+  CASE P_GB.
+    WHEN 'F' OR 'A'.
+      CALL METHOD PO_GRID-&gt;SET_FRONTEND_FIELDCATALOG
+        EXPORTING
+          IT_FIELDCATALOG = PT_FCAT[].
+  ENDCASE.
+
+<font color ="#0000FF">* Sort, SUMMARY등의 REFRESH</font>
+  CASE P_GB.
+    WHEN 'S' OR 'A'.
+      L_SOFT_REFRESH = ''.
+    WHEN OTHERS.
+      L_SOFT_REFRESH = 'X'.
+  ENDCASE.
+
+  LS_STBL-ROW = 'X'.
+  LS_STBL-COL = 'X'.
+
+  CALL METHOD PO_GRID-&gt;REFRESH_TABLE_DISPLAY
+    EXPORTING
+      IS_STABLE      = LS_STBL
+      I_SOFT_REFRESH = L_SOFT_REFRESH.
+
+ENDFORM.                    " ALV_REFRESH
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_MODI_CELL</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_MODI_CELL USING PR_DATA_CHANGED  TYPE REF TO CL_ALV_CHANGED_DATA_PROTOCOL
+                         P_ROW
+                         P_FIELDNAME
+                         P_VALUE.
+
+  CALL METHOD PR_DATA_CHANGED-&gt;MODIFY_CELL
+    EXPORTING
+      I_ROW_ID    = P_ROW
+      I_FIELDNAME = P_FIELDNAME
+      I_VALUE     = P_VALUE.
+
+ENDFORM.                    " ALV_MODI_CELL
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_RELOAD</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_RELOAD.
+
+  IF GO_GRID    IS NOT INITIAL. CALL METHOD GO_GRID-&gt;FREE.    ENDIF.
+<font color ="#0000FF">*  IF GO_GRID1   IS NOT INITIAL. CALL METHOD GO_GRID1-&gt;FREE.   ENDIF.</font>
+<font color ="#0000FF">*  IF GO_GRID2   IS NOT INITIAL. CALL METHOD GO_GRID2-&gt;FREE.   ENDIF.</font>
+
+<font color ="#0000FF">*  IF GO_DOCUMENT IS NOT INITIAL. CALL METHOD GO_DOCUMENT-&gt;INITIALIZE_DOCUMENT. ENDIF.</font>
+
+  IF GO_SPCONT  IS NOT INITIAL. CALL METHOD GO_SPCONT-&gt;FREE.  ENDIF.
+<font color ="#0000FF">*  IF GO_SPCONT1 IS NOT INITIAL. CALL METHOD GO_SPCONT1-&gt;FREE. ENDIF.</font>
+<font color ="#0000FF">*  IF GO_SPCONT2 IS NOT INITIAL. CALL METHOD GO_SPCONT2-&gt;FREE. ENDIF.</font>
+<font color ="#0000FF">*  IF GO_SPLT    IS NOT INITIAL. CALL METHOD GO_SPLT-&gt;FREE.    ENDIF.</font>
+<font color ="#0000FF">*  IF GO_SPLT1   IS NOT INITIAL. CALL METHOD GO_SPLT1-&gt;FREE.   ENDIF.</font>
+
+  IF GO_DOCK    IS NOT INITIAL. CALL METHOD GO_DOCK-&gt;FREE.    ENDIF.
+  IF GO_CONT    IS NOT INITIAL. CALL METHOD GO_CONT-&gt;FREE.    ENDIF.
+<font color ="#0000FF">*  IF GO_CONT1   IS NOT INITIAL. CALL METHOD GO_CONT1-&gt;FREE.   ENDIF.</font>
+<font color ="#0000FF">*  IF GO_CONT2   IS NOT INITIAL. CALL METHOD GO_CONT2-&gt;FREE.   ENDIF.</font>
+
+  CLEAR: GO_DOCK,
+         GO_CONT,    "GO_CONT1,   GO_CONT2,   GO_CONT3,   GO_CONT4,
+         GO_SPLT,                                           "GO_SPLT1,
+         GO_SPCONT,  "GO_SPCONT1, GO_SPCONT2, GO_SPCONT3, GO_SPCONT4,
+         "GO_SPCONT5, GO_SPCONT6, GO_SPCONT7, GO_SPCONT8,
+         GO_GRID.    "GO_GRID1,   GO_GRID2,   GO_GRID3,   GO_GRID4,
+  "GO_GRID5,   GO_GRID6,   GO_GRID7,   GO_GRID8,
+  "GO_DOCUMENT.
+
+<font color ="#0000FF">* CALL METHOD CL_GUI_CFW=&gt;FLUSH.</font>
+
+ENDFORM.                    " ALV_RELOAD
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_SET_CURSOR</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_SET_CURSOR USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+                          P_ROWID
+                          P_COLNM.
+
+  DATA: LS_ROW TYPE LVC_S_ROW,
+        LS_COL TYPE LVC_S_COL.
+
+  LS_ROW-INDEX     = P_ROWID.
+  LS_COL-FIELDNAME = P_COLNM.
+
+<font color ="#0000FF">*  CALL METHOD PO_GRID-&gt;SET_SCROLL_INFO_VIA_ID</font>
+<font color ="#0000FF">*    EXPORTING</font>
+<font color ="#0000FF">*      IS_ROW_INFO = LS_ROW</font>
+<font color ="#0000FF">*      IS_COL_INFO = LS_COL.</font>
+
+  CALL METHOD PO_GRID-&gt;SET_CURRENT_CELL_VIA_ID
+    EXPORTING
+      IS_ROW_ID    = LS_ROW
+      IS_COLUMN_ID = LS_COL.
+
+  CALL METHOD CL_GUI_ALV_GRID=&gt;SET_FOCUS
+    EXPORTING
+      CONTROL = PO_GRID.
+
+ENDFORM.                    " ALV_SET_CURSOR
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_SET_DDLB</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_SET_DDLB USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+<font color ="#0000FF">*                        PT_DROP TYPE        LVC_T_DROP.</font>
+                        PT_DRAL TYPE        LVC_T_DRAL.
+
+  CALL METHOD PO_GRID-&gt;SET_DROP_DOWN_TABLE
+    EXPORTING
+<font color ="#0000FF">*      IT_DROP_DOWN =       PT_DROP[].</font>
+      IT_DROP_DOWN_ALIAS = PT_DRAL[].
+
+ENDFORM.                    " ALV_SET_DDLB
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_SET_MARK</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  선택된 행들의 MARK 필드를 'X' 처리한다. SY-TABIX에 선택된 행의 건수</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_SET_MARK USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+                        PT_ITAB TYPE STANDARD TABLE.
+
+  FIELD-SYMBOLS: &lt;FS_WA&gt; TYPE ANY,
+                 &lt;FS&gt;.
+
+  DATA: LT_ROW  TYPE LVC_T_ROW WITH HEADER LINE,
+        L_TABIX TYPE SY-TABIX.
+
+  CALL METHOD PO_GRID-&gt;GET_SELECTED_ROWS
+    IMPORTING
+      ET_INDEX_ROWS = LT_ROW[].
+
+  LOOP AT PT_ITAB ASSIGNING &lt;FS_WA&gt;.
+    ASSIGN COMPONENT 'MARK' OF STRUCTURE &lt;FS_WA&gt; TO &lt;FS&gt;.
+    IF &lt;FS&gt; = ' '. CONTINUE. ENDIF.
+    &lt;FS&gt; = ' '.
+    MODIFY PT_ITAB FROM &lt;FS_WA&gt;.
+  ENDLOOP.
+
+  LOOP AT LT_ROW WHERE ROWTYPE = ' '.
+    READ TABLE PT_ITAB ASSIGNING &lt;FS_WA&gt; INDEX LT_ROW-INDEX.
+    IF SY-SUBRC &lt;&gt; 0. CONTINUE. ENDIF.
+    ASSIGN COMPONENT 'MARK' OF STRUCTURE &lt;FS_WA&gt; TO &lt;FS&gt;.
+    &lt;FS&gt; = 'X'.
+    MODIFY PT_ITAB FROM &lt;FS_WA&gt; INDEX LT_ROW-INDEX.
+    L_TABIX = L_TABIX + 1.
+  ENDLOOP.
+
+  SY-TABIX = L_TABIX.
+
+ENDFORM.                    " ALV_SET_MARK
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_SET_ROW_COLOR</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  더블클릭한 행을 ROW_COLOR = 'C500'. 처리한다. & REFRESH</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_SET_ROW_COLOR USING    PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+                                PT_FCAT TYPE        LVC_T_FCAT
+                                P_TABIX
+                       CHANGING CT_M    TYPE STANDARD TABLE.
+
+  DATA: L_FNAME(30).
+
+  FIELD-SYMBOLS: &lt;LFS_WA&gt; TYPE ANY,
+                 &lt;LFS&gt;.
+
+  L_FNAME = 'ROW_COLOR'.
+
+  READ TABLE CT_M ASSIGNING &lt;LFS_WA&gt; WITH KEY (L_FNAME) = 'C500'.
+  IF SY-SUBRC = 0.
+    ASSIGN COMPONENT L_FNAME OF STRUCTURE &lt;LFS_WA&gt; TO &lt;LFS&gt;.
+    &lt;LFS&gt; = ''.
+    MODIFY CT_M FROM &lt;LFS_WA&gt; INDEX SY-TABIX TRANSPORTING (L_FNAME).
+  ENDIF.
+
+  READ TABLE CT_M ASSIGNING &lt;LFS_WA&gt; INDEX P_TABIX.
+  IF SY-SUBRC = 0.
+    ASSIGN COMPONENT L_FNAME OF STRUCTURE &lt;LFS_WA&gt; TO &lt;LFS&gt;.
+    &lt;LFS&gt; = 'C500'.
+    MODIFY CT_M FROM &lt;LFS_WA&gt; INDEX SY-TABIX TRANSPORTING (L_FNAME).
+  ENDIF.
+
+  PERFORM ALV_REFRESH USING PO_GRID PT_FCAT ''.
+
+ENDFORM.                    " ALV_SET_ROW_COLOR
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_SET_NEW_OK_CODE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  ALV 이벤트 후에 화면 PAI 를 타게 한다.</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_SET_NEW_OK_CODE USING P_NEW_OKCD.
+
+  CALL METHOD CL_GUI_CFW=&gt;SET_NEW_OK_CODE
+    EXPORTING
+      NEW_CODE = P_NEW_OKCD.
+
+ENDFORM.                    " ALV_SET_NEW_OK_CODE
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_SET_SEL_ROW</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_SET_SEL_ROW USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+                           P_ROW.
+
+  DATA: LT_ROW TYPE LVC_T_ROW WITH HEADER LINE.
+
+  LT_ROW-INDEX = P_ROW.
+  APPEND LT_ROW.
+
+  CALL METHOD PO_GRID-&gt;SET_SELECTED_ROWS
+    EXPORTING
+      IT_INDEX_ROWS = LT_ROW[].
+<font color ="#0000FF">*      IT_ROW_NO                =</font>
+<font color ="#0000FF">*      IS_KEEP_OTHER_SELECTIONS = 'X'.</font>
+
+ENDFORM.                    " ALV_SET_SEL_ROW
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_SET_SEL_ROW_ALL</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_SET_SEL_ROW_ALL USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+                               PT_M    TYPE STANDARD TABLE
+                               P_SEL_ALL.
+
+  DATA: LT_ROW TYPE LVC_T_ROW WITH HEADER LINE.
+
+  FIELD-SYMBOLS: &lt;FS_WA&gt; TYPE ANY.
+
+  IF P_SEL_ALL = 'X'.
+    LOOP AT PT_M ASSIGNING &lt;FS_WA&gt;.
+      LT_ROW-INDEX = SY-TABIX.
+      APPEND LT_ROW.
+    ENDLOOP.
+  ENDIF.
+
+  CALL METHOD PO_GRID-&gt;SET_SELECTED_ROWS
+    EXPORTING
+      IT_INDEX_ROWS = LT_ROW[].
+<font color ="#0000FF">*      IT_ROW_NO                =</font>
+<font color ="#0000FF">*      IS_KEEP_OTHER_SELECTIONS = 'X'.</font>
+
+ENDFORM.                    " ALV_SET_SEL_ROW_ALL
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_TOOLBAR_SET_CNT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_TOOLBAR_SET_CNT USING E_OBJECT TYPE REF TO CL_ALV_EVENT_TOOLBAR_SET
+                               PO_GRID  TYPE REF TO CL_GUI_ALV_GRID
+                               PT_IT    TYPE STANDARD TABLE.
+
+  DATA: LS_TOOLBAR TYPE STB_BUTTON,
+        LT_FIDX    TYPE LVC_T_FIDX,
+        L_TOT_CNT(10) VALUE '0',
+        L_SUC_CNT(10) VALUE '0',
+        L_WRN_CNT(10) VALUE '0',
+        L_ERR_CNT(10) VALUE '0',
+        L_FIL_CNT(10) VALUE '0'.
+
+<font color ="#0000FF">* 건수</font>
+  DESCRIBE TABLE PT_IT LINES L_TOT_CNT.  "총건수
+
+<font color ="#0000FF">* 필터링 건수</font>
+  CALL METHOD PO_GRID-&gt;GET_FILTERED_ENTRIES
+    IMPORTING
+      ET_FILTERED_ENTRIES = LT_FIDX.
+  DESCRIBE TABLE LT_FIDX LINES L_FIL_CNT.
+
+<font color ="#0000FF">* 현재 건수 = 총건수 - 필터링 건수</font>
+  L_FIL_CNT = L_TOT_CNT - L_FIL_CNT.
+
+  CONDENSE: L_TOT_CNT NO-GAPS,
+            L_SUC_CNT NO-GAPS,
+            L_WRN_CNT NO-GAPS,
+            L_ERR_CNT NO-GAPS,
+            L_FIL_CNT NO-GAPS.
+
+<font color ="#0000FF">* 버튼 추가</font>
+  CLEAR LS_TOOLBAR.
+  LS_TOOLBAR-FUNCTION  = '&&SEP90'.
+  LS_TOOLBAR-BUTN_TYPE = '3'.  "분리자
+  APPEND LS_TOOLBAR TO E_OBJECT-&gt;MT_TOOLBAR.
+
+  CLEAR LS_TOOLBAR.
+  LS_TOOLBAR-FUNCTION  = 'TOT_CNT'.
+  CONCATENATE 'Tot:' L_TOT_CNT INTO LS_TOOLBAR-TEXT SEPARATED BY ''.
+  APPEND LS_TOOLBAR TO E_OBJECT-&gt;MT_TOOLBAR.
+
+  IF LT_FIDX[] IS NOT INITIAL.
+    CLEAR LS_TOOLBAR.
+    LS_TOOLBAR-FUNCTION  = 'CUR_CNT'.
+    CONCATENATE 'Cur:' L_FIL_CNT INTO LS_TOOLBAR-TEXT SEPARATED BY ''.
+    APPEND LS_TOOLBAR TO E_OBJECT-&gt;MT_TOOLBAR.
+  ENDIF.
+
+ENDFORM.                    " ALV_TOOLBAR_SET_CNT
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_USER_CMD_FILTER</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+FORM ALV_USER_CMD_FILTER USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+                               PT_FCAT TYPE LVC_T_FCAT
+                               P_FNAME
+                               P_VAL.         "EQ_INITIAL, NE_INITIAL
+
+  DATA: LT_FILTER TYPE LVC_T_FILT WITH HEADER LINE.
+
+  CALL METHOD PO_GRID-&gt;GET_FILTER_CRITERIA
+    IMPORTING
+      ET_FILTER = LT_FILTER[].
+
+  IF P_FNAME IS INITIAL.
+    CLEAR LT_FILTER[].
+  ELSE.
+    DELETE LT_FILTER WHERE FIELDNAME = P_FNAME.
+  ENDIF.
+
+  CASE P_VAL.
+    WHEN 'EQ_INITIAL'.
+      CLEAR: LT_FILTER.
+      LT_FILTER-FIELDNAME = P_FNAME.
+      LT_FILTER-SIGN      = 'I'.
+      LT_FILTER-OPTION    = 'EQ'.
+      APPEND LT_FILTER.
+    WHEN 'NE_INITIAL'.
+      CLEAR: LT_FILTER.
+      LT_FILTER-FIELDNAME = P_FNAME.
+      LT_FILTER-SIGN      = 'I'.
+      LT_FILTER-OPTION    = 'NE'.
+      APPEND LT_FILTER.
+    WHEN OTHERS.
+      CLEAR: LT_FILTER.
+      LT_FILTER-FIELDNAME = P_FNAME.
+      LT_FILTER-SIGN      = 'I'.
+      LT_FILTER-OPTION    = 'EQ'.
+      LT_FILTER-LOW       = P_VAL.
+      APPEND LT_FILTER.
+  ENDCASE.
+
+  CALL METHOD PO_GRID-&gt;SET_FILTER_CRITERIA
+    EXPORTING
+      IT_FILTER                 = LT_FILTER[]
+    EXCEPTIONS
+      NO_FIELDCATALOG_AVAILABLE = 1
+      OTHERS                    = 2.
+
+  IF SY-SUBRC &lt;&gt; 0.
+    MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+       WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+  PERFORM ALV_REFRESH USING PO_GRID PT_FCAT[] 'A'.
+
+ENDFORM.                    " ALV_USER_CMD_FILTER
+
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* 아래의 FORM 문을 모두 해당 프로그램에 복사해서 만듬</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_FIELDCAT_0100</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*FORM ALV_FIELDCAT_0100 TABLES PT_FCAT STRUCTURE LVC_S_FCAT.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  LOOP AT PT_FCAT.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    PT_FCAT-COL_OPT = 'X'.</font>
+<font color ="#0000FF">*    PT_FCAT-KEY     = ' '.</font>
+<font color ="#0000FF">*    PT_FCAT-NO_OUT  = ' '.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    CASE PT_FCAT-FIELDNAME.</font>
+<font color ="#0000FF">*      WHEN 'RCOMP'.</font>
+<font color ="#0000FF">*        PT_FCAT-COL_POS     = '10'.</font>
+<font color ="#0000FF">*        PT_FCAT-COLTEXT     = 'S'.</font>
+<font color ="#0000FF">*      WHEN OTHERS.</font>
+<font color ="#0000FF">*        PT_FCAT-NO_OUT      = 'X'.</font>
+<font color ="#0000FF">*    ENDCASE.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    MODIFY PT_FCAT.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  ENDLOOP.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*ENDFORM.                    " ALV_FIELDCAT_0100</font>
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_DATA_CHANGED</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*FORM ALV_DATA_CHANGED USING P_GRID_NM</font>
+<font color ="#0000FF">*                            ER_DATA_CHANGED TYPE REF TO CL_ALV_CHANGED_DATA_PROTOCOL</font>
+<font color ="#0000FF">*                            E_ONF4</font>
+<font color ="#0000FF">*                            E_ONF4_BEFORE</font>
+<font color ="#0000FF">*                            E_ONF4_AFTER</font>
+<font color ="#0000FF">*                            E_UCOMM.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  IF E_ONF4 = 'X' AND E_ONF4_BEFORE = 'X' AND E_ONF4_AFTER = ''. EXIT. ENDIF.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*ENDFORM.                    " ALV_DATA_CHANGED</font>
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_DATA_CHANGED_FINISHED</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*FORM ALV_DATA_CHANGED_FINISHED USING P_GRID_NAME</font>
+<font color ="#0000FF">*                                     E_MODIFIED    TYPE CHAR01</font>
+<font color ="#0000FF">*                                     ET_GOOD_CELLS TYPE LVC_T_MODI.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  DATA: LS_MODI TYPE LVC_S_MODI.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  IF E_MODIFIED = ''. EXIT. ENDIF.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  LOOP AT ET_GOOD_CELLS INTO LS_MODI.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    READ TABLE GT_A INDEX LS_MODI-ROW_ID.</font>
+<font color ="#0000FF">*    IF SY-SUBRC &lt;&gt; 0.</font>
+<font color ="#0000FF">*      MESSAGE E899(MM) WITH 'IT READ ERROR'.</font>
+<font color ="#0000FF">*    ENDIF.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    CASE LS_MODI-FIELDNAME.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*      WHEN 'RCOMP'.</font>
+<font color ="#0000FF">*        PERFORM SEL_T880_TXT USING    GT_A-RCOMP</font>
+<font color ="#0000FF">*                             CHANGING GT_A-RCOMP_NM</font>
+<font color ="#0000FF">*                                      GT_A-HWAER.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    ENDCASE.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    MODIFY GT_A INDEX LS_MODI-ROW_ID.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  ENDLOOP.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  G_MODI_GB = 'X'.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  PERFORM ALV_REFRESH USING GO_GRID GT_FIELDCAT[] 'F'.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*ENDFORM.                    " ALV_DATA_CHANGED_FINISHED</font>
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_DOUBLE_CLICK</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*FORM ALV_DOUBLE_CLICK USING P_GRID_NM</font>
+<font color ="#0000FF">*                            P_ROW TYPE LVC_S_ROW</font>
+<font color ="#0000FF">*                            P_COL TYPE LVC_S_COL.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">** 화면 PAI 를 타도록 할 경우</font>
+<font color ="#0000FF">*  CALL METHOD CL_GUI_CFW=&gt;SET_NEW_OK_CODE</font>
+<font color ="#0000FF">*    EXPORTING</font>
+<font color ="#0000FF">*      NEW_CODE = 'ALV_DBL_CLK'.</font>
+
+<font color ="#0000FF">*ENDFORM.                    " ALV_DOUBLE_CLICK</font>
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_F4</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*FORM ALV_F4  USING P_GRID_NM</font>
+<font color ="#0000FF">*                   PO_sender      TYPE REF TO cl_gui_alv_grid</font>
+<font color ="#0000FF">*                   P_fieldname    TYPE lvc_fname</font>
+<font color ="#0000FF">*                   P_fieldvalue   TYPE lvc_value</font>
+<font color ="#0000FF">*                   PS_row_no      TYPE lvc_s_roid</font>
+<font color ="#0000FF">*                   PO_event_data  TYPE REF TO cl_alv_event_data</font>
+<font color ="#0000FF">*                   PT_bad_cells   TYPE lvc_t_modi</font>
+<font color ="#0000FF">*                   P_display      TYPE char01.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*ENDFORM.                    " ALV_F4</font>
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_TOOLBAR</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*FORM ALV_TOOLBAR USING P_GRID_NM</font>
+<font color ="#0000FF">*                       E_OBJECT TYPE REF TO CL_ALV_EVENT_TOOLBAR_SET</font>
+<font color ="#0000FF">*                       E_INTERACTIVE.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*ENDFORM.                    " ALV_TOOLBAR</font>
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_BEFORE_USER_COMMAND</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*FORM ALV_BEFORE_USER_COMMAND USING P_GRID_NM</font>
+<font color ="#0000FF">*                                   E_UCOMM LIKE SY-UCOMM.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*ENDFORM.                    " ALV_BEFORE_USER_COMMAND</font>
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_USER_COMMAND</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*FORM ALV_USER_COMMAND USING P_GRID_NM</font>
+<font color ="#0000FF">*                            E_UCOMM LIKE SY-UCOMM.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*ENDFORM.                    " ALV_USER_COMMAND</font>
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_AFTER_USER_COMMAND</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*FORM ALV_AFTER_USER_COMMAND USING P_GRID_NM</font>
+<font color ="#0000FF">*                                  E_UCOMM LIKE sy-ucomm</font>
+<font color ="#0000FF">*                                  E_SAVED</font>
+<font color ="#0000FF">*                                  E_NOT_PROCESSED.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*ENDFORM.                    " ALV_AFTER_USER_COMMAND</font>
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_BUTTON_CLICK</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*FORM ALV_BUTTON_CLICK USING P_GRID_NAME</font>
+<font color ="#0000FF">*                            PS_COL_ID TYPE LVC_S_COL</font>
+<font color ="#0000FF">*                            PS_ROW_NO TYPE LVC_S_ROID.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*ENDFORM.                    " ALV_BUTTON_CLICK</font>
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_TOP_OF_PAGE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*FORM ALV_TOP_OF_PAGE USING P_GRID_NAME.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  WRITE: /,</font>
+<font color ="#0000FF">*         / SY-TITLE CENTERED,</font>
+<font color ="#0000FF">*         /.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*ENDFORM.                    " ALV_TOP_OF_PAGE</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

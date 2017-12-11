@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR13_18F01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR13_18F01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZEDR13_18F01</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZEDR13_18F01</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_DATA</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM get_data .
+
+<font color ="#0000FF">* 파라미터가 필수입력이면 낫이니셜문 안써도 됨</font>
+<font color ="#0000FF">*  IF p_mjahr IS NOT INITIAL.</font>
+<font color ="#0000FF">*    gr_mjahr-sign = 'I'.</font>
+<font color ="#0000FF">*    gr_mjahr-option ='EQ'.</font>
+<font color ="#0000FF">*    gr_mjahr-low = p_mjahr.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    APPEND gr_mjahr.</font>
+<font color ="#0000FF">*    CLEAR gr_mjahr.</font>
+<font color ="#0000FF">*  ENDIF.</font>
+
+
+  SELECT mblnr mjahr vgart blart budat bktxt
+    INTO CORRESPONDING FIELDS OF TABLE gt_data
+    FROM mkpf
+    WHERE mjahr = p_mjahr
+    AND mblnr IN s_mblnr.
+
+
+  IF go_handler IS NOT BOUND.
+    CREATE OBJECT go_handler.
+  ENDIF.
+
+<font color ="#0000FF">*   CALL METHOD go_handler-&gt;get_sflight</font>
+<font color ="#0000FF">*   EXPORTING</font>
+<font color ="#0000FF">*   e_carrid = s_carrid-low.</font>
+
+  IF gt_data[] IS INITIAL.
+    MESSAGE s000 WITH 'Data Not Found'.
+    LEAVE LIST-PROCESSING.
+  ENDIF.
+
+  DATA : lv_index LIKE sy-tabix.
+
+  LOOP AT gt_data.
+    lv_index = sy-tabix.
+    IF gt_data-vgart = 'WL'.
+      gt_data-color = 'C610'.
+
+    ENDIF.
+    MODIFY gt_data INDEX lv_index TRANSPORTING color.
+  ENDLOOP.
+
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_FCAT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_0044   text</font>
+<font color ="#0000FF">*      --&gt;P_0045   text</font>
+<font color ="#0000FF">*      --&gt;P_0046   text</font>
+<font color ="#0000FF">*      --&gt;P_0047   text</font>
+<font color ="#0000FF">*      --&gt;P_0048   text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_fcat  USING  p_key p_fieldname p_coltext p_ref_table p_ref_field.
+  gs_fcat-key       = p_key.
+  gs_fcat-fieldname = p_fieldname.
+  gs_fcat-coltext   = p_coltext.
+  gs_fcat-ref_table = p_ref_table.
+  gs_fcat-ref_field = p_ref_field.
+  APPEND gs_fcat TO gt_fcat.
+  CLEAR gs_fcat.
+
+
+
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  DOUBLE_HANDLE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_E_ROW  text</font>
+<font color ="#0000FF">*      --&gt;P_E_COLUMN  text</font>
+<font color ="#0000FF">*      --&gt;P_ES_ROW_NO  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM double_handle  USING    e_row_id STRUCTURE lvc_s_row
+                           e_column_id STRUCTURE lvc_s_col
+                           es_row_no STRUCTURE lvc_s_roid.
+
+
+  READ TABLE gt_data INDEX e_row_id-index.
+
+  IF sy-subrc EQ 0.
+    SET PARAMETER ID : 'MJA' FIELD gt_data-mjahr,
+                       'MBN' FIELD gt_data-mblnr.
+    CALL TRANSACTION 'MB03' AND SKIP FIRST SCREEN.
+
+  ENDIF.
+
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_SFLIGHT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_E_CARRID  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*FORM get_sflight  USING    p_carrid.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    SELECT carrid</font>
+<font color ="#0000FF">*    INTO CORRESPONDING FIELDS OF TABLE gt_data</font>
+<font color ="#0000FF">*    FROM sflight</font>
+<font color ="#0000FF">*    WHERE carrid = p_carrid.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*ENDFORM.</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

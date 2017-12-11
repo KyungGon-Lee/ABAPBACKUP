@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR13_15TOP</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR13_15TOP</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZEDR13_15TOP</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Include ZEDR13_15TOP                                      Report ZEDR13_15</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT ZEDR13_15.
+
+TABLES : RESB.
+
+DATA : BEGIN OF gt_data OCCURS 0,
+
+  RSNUM       LIKE RESB-RSNUM,
+  RSPOS       LIKE RESB-RSPOS,
+  RSART       LIKE RESB-RSART,
+  BDART       LIKE RESB-BDART,
+  MATNR       LIKE RESB-MATNR,
+  MAKTX       LIKE MAKT-MAKTX,
+  WERKS       LIKE RESB-WERKS,
+  WERKS_NAME  LIKE T001W-NAME1,
+  CHARG       LIKE RESB-CHARG,
+  BDMNG       LIKE RESB-BDMNG,
+  MEINS       LIKE RESB-MEINS,
+  color(4),
+  cell_color TYPE lvc_t_scol,
+
+
+  END OF gt_data.
+
+  DATA :
+<font color ="#0000FF">*       go_container TYPE REF TO cl_gui_custom_container,</font>
+       go_container TYPE REF TO cl_gui_docking_container,
+       go_grid      TYPE REF TO cl_gui_alv_grid,
+       gs_fcat      TYPE lvc_s_fcat,
+       gt_fcat      TYPE lvc_t_fcat,
+       gs_layout    TYPE lvc_s_layo,
+       gs_variant   TYPE disvariant,
+       gs_scol      TYPE lvc_s_scol.
+
+  RANGES : gr_rsart FOR RESB-RSART.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR13_19TOP</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR13_19TOP</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZEDR13_19TOP</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Include ZEDR13_19TOP                                      Report ZEDR13_19</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT zedr13_19 MESSAGE-ID oo.
+
+CLASS lcl_event_handler DEFINITION DEFERRED.
+
+TABLES : mkpf.
+
+DATA : BEGIN OF gt_data OCCURS 0,
+MJAHR LIKE MKPF-MJAHR,
+MBLNR LIKE MKPF-MBLNR,
+ZEILE	LIKE MSEG-ZEILE,
+VGART	LIKE MKPF-VGART,
+BUDAT	LIKE MKPF-BUDAT,
+BWART	LIKE MSEG-BWART,
+MATNR	LIKE MSEG-MATNR,
+MAKTX	LIKE MAKT-MAKTX,
+WERKS	LIKE MSEG-WERKS,
+WERKS_NAME LIKE T001W-NAME1,
+DMBTR	LIKE MSEG-DMBTR,
+WAERS	LIKE MSEG-WAERS,
+MENGE	LIKE MSEG-MENGE,
+MEINS	LIKE MSEG-MEINS,
+color(4),
+cell_color TYPE lvc_t_scol,
+END OF gt_data.
+
+
+DATA : gv_okcode LIKE sy-ucomm.
+
+
+
+DATA :
+  go_container TYPE REF TO cl_gui_docking_container,
+  go_grid      TYPE REF TO cl_gui_alv_grid,
+  go_mseg      TYPE REF TO zcl13_mseg,
+  go_handler   TYPE REF TO lcl_event_handler,
+  gs_fcat      TYPE lvc_s_fcat,
+  gt_fcat      TYPE lvc_t_fcat,
+  gs_layout    TYPE lvc_s_layo,
+  gs_stable    TYPE lvc_s_stbl,
+  gs_variant   TYPE disvariant,
+  gs_scol      TYPE lvc_s_scol.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

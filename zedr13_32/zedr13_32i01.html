@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR13_32I01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR13_32I01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZEDR13_32I01</b></font>
+<hr>
+<pre width="100">
+
+MODULE exit_0100 INPUT.
+  CALL METHOD : go_grid1-&gt;free, go_container1-&gt;free.
+  FREE : go_grid1,go_container1.
+
+  IF go_container2 IS NOT INITIAL.
+    CALL METHOD : go_grid2-&gt;free, go_container2-&gt;free.
+    FREE : go_container2, go_grid2.
+  ENDIF.
+
+  LEAVE TO SCREEN 0.
+ENDMODULE.
+
+
+MODULE change_tab INPUT.
+  CASE gv_okcode.
+    WHEN 'TAB1' OR 'TAB2'.
+      gv_pressedtab = gv_okcode.
+  ENDCASE.
+ENDMODULE.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

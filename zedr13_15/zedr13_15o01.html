@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR13_15O01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR13_15O01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZEDR13_15O01</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZEDR13_15O01</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+SELECTION-SCREEN BEGIN OF BLOCK bl1 WITH FRAME TITLE text-001.
+
+
+SELECT-OPTIONS : s_rsnum FOR RESB-RSNUM.
+
+PARAMETERS : p_rsart LIKE RESB-RSART.
+SELECTION-SCREEN END OF BLOCK bl1.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  STATUS_0100  OUTPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+MODULE status_0100 OUTPUT.
+  SET PF-STATUS '0100'.
+  SET TITLEBAR '0100'.
+ENDMODULE.
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  SET_FIELD  OUTPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+MODULE set_field OUTPUT.
+  CLEAR : gs_fcat, gt_fcat.
+
+  PERFORM set_fcat USING :
+        'X' 'RSNUM' '예약번호' 'RESB' 'RSNUM',
+        'X' 'RSPOS' '예약순번' 'RESB' 'RSPOS',
+        'X' 'RSART' '레코드유형' 'RESB' 'RSART',
+        ' ' 'BDART' '요구유형' 'RESB' 'BDART',
+        ' ' 'MATNR' '자재번호' 'RESB' 'MATNR',
+        ' ' 'MAKTX' '자재내역' 'MAKT' 'MAKTX',
+        ' ' 'WERKS' '플랜트' 'RESB' 'WERKS',
+        ' ' 'WERKS_NAME' '플랜트내역' 'T001W' 'NAME1',
+        ' ' 'CHARG' '배치번호' 'RESB' 'CHARG',
+        ' ' 'BDMNG' '요구수량' 'RESB' 'BDMNG',
+        ' ' 'MEINS' '단위' 'RESB' 'MEINS'.
+
+
+        gs_layout-sel_mode = 'D'.
+        gs_layout-zebra    = 'X'.
+        gs_variant-report  = sy-repid.
+        gs_layout-cwidth_opt = 'X'.
+        gs_layout-info_fname = 'COLOR'.
+        gs_layout-ctab_fname = 'CELL_COLOR'.
+
+
+
+
+ENDMODULE.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  DISPLAY-SCREEN  OUTPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+MODULE display-screen OUTPUT.
+<font color ="#0000FF">*CREATE OBJECT go_container</font>
+<font color ="#0000FF">*  EXPORTING</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    container_name              = 'GO_CONTAINER'.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+
+CREATE OBJECT go_container
+  EXPORTING
+    side                        = go_container-&gt;DOCK_AT_LEFT
+
+<font color ="#0000FF">*    side                        = cl_gui_docking_container=&gt;DOCK_AT_LEFT</font>
+<font color ="#0000FF">*직접 하는거</font>
+    extension                   = 2000.
+
+
+
+CREATE OBJECT go_grid
+  EXPORTING
+    i_parent          = go_container.
+
+    CALL METHOD go_grid-&gt;set_table_for_first_display
+      EXPORTING
+<font color ="#0000FF">*        i_buffer_active               =</font>
+<font color ="#0000FF">*        i_bypassing_buffer            =</font>
+<font color ="#0000FF">*        i_consistency_check           =</font>
+<font color ="#0000FF">*        i_structure_name              =</font>
+        is_variant                    = gs_variant
+<font color ="#0000FF">*        i_save                        =</font>
+<font color ="#0000FF">*        i_default                     = 'X'</font>
+        is_layout                     = gs_layout
+<font color ="#0000FF">*        is_print                      =</font>
+<font color ="#0000FF">*        it_special_groups             =</font>
+<font color ="#0000FF">*        it_toolbar_excluding          =</font>
+<font color ="#0000FF">*        it_hyperlink                  =</font>
+<font color ="#0000FF">*        it_alv_graphics               =</font>
+<font color ="#0000FF">*        it_except_qinfo               =</font>
+<font color ="#0000FF">*        ir_salv_adapter               =</font>
+      CHANGING
+        it_outtab                     = gt_data[]
+        it_fieldcatalog               = gt_fcat
+<font color ="#0000FF">*        it_sort                       =</font>
+<font color ="#0000FF">*        it_filter                     =</font>
+<font color ="#0000FF">*      EXCEPTIONS</font>
+<font color ="#0000FF">*        invalid_parameter_combination = 1</font>
+<font color ="#0000FF">*        program_error                 = 2</font>
+<font color ="#0000FF">*        too_many_lines                = 3</font>
+<font color ="#0000FF">*        others                        = 4</font>
+            .
+    IF sy-subrc &lt;&gt; 0.
+<font color ="#0000FF">*     Implement suitable error handling here</font>
+    ENDIF.
+
+
+
+
+ENDMODULE.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

@@ -1,0 +1,2088 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZPPG0220_13</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZPPG0220_13</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Program ZPPG0220_13</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report ZPPG0220_13</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT ZPPG0220_13 MESSAGE-ID ZPPGM.
+
+include <a href ="zcag0000_alv.html">ZCAG0000_ALV</a>. " Common ALV
+include <a href ="zcag0000_f01.html">ZCAG0000_F01</a>. " Common Function
+include <a href ="zppg0000_f01.html">ZPPG0000_F01</a>. " Common Function
+
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* Table</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+TABLES: ZPPG0150T, ZPPG0064T.
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* Type</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+TYPES : BEGIN OF GY_SEARCH,
+          WERKS TYPE WERKS_D,
+          MATNR TYPE MATNR,
+          ARBPL TYPE ARBPL,
+          EQUNR TYPE EQUNR,
+        END OF GY_SEARCH.
+
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* 광역변수</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+DATA: GV_OKCD  LIKE SY-UCOMM,
+      GV_UCOM  LIKE SY-UCOMM.
+DATA: GV_ERROR.
+DATA: GV_SPMON TYPE SPMON.
+
+DATA: GV_FIELD_INDEX(8)  TYPE  N,
+      GV_COL_INDEX       TYPE  I,
+      GV_PERIOD          LIKE  VTBBEWE-ATAGE,
+      GV_PER(45)         VALUE 'PER',
+      GV_PER_T(30)       VALUE '00/00',
+      GV_T_PER(45)       VALUE '&lt;GF_WA&gt;-PER'.
+
+<font color ="#0000FF">* creating dyn table</font>
+FIELD-SYMBOLS:  &lt;GF_TABLE&gt;  TYPE STANDARD TABLE,
+                &lt;GF_WA&gt;,
+                &lt;GF_FIELD&gt;.
+
+DATA: GV_DY_TABLE  TYPE REF TO DATA,
+      GV_DY_LINE   TYPE REF TO DATA.
+
+CONSTANTS:
+      C_ZDEPT(45)         VALUE 'ZDEPT',"2014.05.05
+      C_ARBPL(45)         VALUE 'ARBPL',
+      C_ARBPL_T(45)       VALUE 'ARBPL_T',
+      C_EQUNR(45)         VALUE 'EQUNR',
+      C_EQUNR_T(45)       VALUE 'EQUNR_T',
+      C_LOGRP(45)         VALUE 'LOGRP',
+      C_MATNR(45)         VALUE 'MATNR',
+      C_MATNR_T(45)       VALUE 'MATNR_T',
+      C_CHARG(45)         VALUE 'CHARG',
+      C_PER(45)           VALUE 'PER',
+      C_MEINS(45)         VALUE 'MEINS',
+      C_SUM(45)           VALUE 'SUM',
+      C_STPRS(45)         VALUE 'STPRS',
+      C_WAERS(45)         VALUE 'WAERS',
+      C_ARBPL1(45)        VALUE 'ARBPL1',
+      C_EQUNR1(45)        VALUE 'EQUNR1',
+      C_LOGRP1(45)        VALUE 'LOGRP1',
+      C_MATNR1(45)        VALUE 'MATNR1',
+      C_ZDEPT1(45)        VALUE 'ZDEPT1'."2014.05.05
+
+
+CONSTANTS:
+      C_T_ZDEPT(45)         VALUE '&lt;GF_WA&gt;-ZDEPT',"2014.05.05
+      C_T_ARBPL(45)         VALUE '&lt;GF_WA&gt;-ARBPL',
+      C_T_ARBPL_T(45)       VALUE '&lt;GF_WA&gt;-ARBPL_T',
+      C_T_EQUNR(45)         VALUE '&lt;GF_WA&gt;-EQUNR',
+      C_T_EQUNR_T(45)       VALUE '&lt;GF_WA&gt;-EQUNR_T',
+      C_T_LOGRP(45)         VALUE '&lt;GF_WA&gt;-LOGRP',
+      C_T_MATNR(45)         VALUE '&lt;GF_WA&gt;-MATNR',
+      C_T_MATNR_T(45)       VALUE '&lt;GF_WA&gt;-MATNR_T',
+      C_T_CHARG(45)         VALUE '&lt;GF_WA&gt;-CHARG',
+      C_T_PER(45)           VALUE '&lt;GF_WA&gt;-PER',
+      C_T_MEINS(45)         VALUE '&lt;GF_WA&gt;-MEINS',
+      C_T_SUM(45)           VALUE '&lt;GF_WA&gt;-SUM',
+      C_T_STPRS(45)         VALUE '&lt;GF_WA&gt;-STPRS',
+      C_T_WAERS(45)         VALUE '&lt;GF_WA&gt;-WAERS',
+      C_T_ARBPL1(45)        VALUE '&lt;GF_WA&gt;-ARBPL1',
+      C_T_EQUNR1(45)        VALUE '&lt;GF_WA&gt;-EQUNR1',
+      C_T_LOGRP1(45)        VALUE '&lt;GF_WA&gt;-LOGRP1',
+      C_T_MATNR1(45)        VALUE '&lt;GF_WA&gt;-MATNR1',
+      C_T_ZDEPT1(45)        VALUE '&lt;GF_WA&gt;-ZDEPT1'."2014.05.05
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* IT & STRUCTURE</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+DATA : BEGIN OF GT_DATA OCCURS 0.
+        include structure <a href ="zppg0150t/dictionary-zppg0150t.html">ZPPG0150T</a>.
+
+DATA: ZDEPT   LIKE ZPPG0064T-ZDEPT, "2014.05.05
+      MTART   LIKE MARA-MTART,
+      MATNR_T LIKE MAKT-MAKTX,
+      ARBPL_T LIKE CRTX-KTEXT,
+      EQUNR_T LIKE EQKT-EQKTX.
+DATA:    END OF GT_DATA.
+
+RANGES: R_BUDAT FOR ZPPG0150T-BUDAT.
+RANGES: R_SHIFT FOR ZPPG0150T-LOGRP.
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* SELECTION-SCREEN</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+SELECTION-SCREEN BEGIN OF BLOCK B1 WITH FRAME TITLE TEXT-S01.
+PARAMETERS: P_WERKS LIKE MARC-WERKS OBLIGATORY .
+PARAMETERS: P_SPMON TYPE SPMON OBLIGATORY DEFAULT SY-DATLO+0(6).
+SELECT-OPTIONS : S_BUDAT FOR ZPPG0150T-BUDAT,
+                 S_ZDEPT FOR ZPPG0064T-ZDEPT, "2014.05.05
+                 S_ARBPL FOR ZPPG0150T-ARBPL,
+                 S_EQUNR FOR ZPPG0150T-EQUNR.
+SELECTION-SCREEN BEGIN OF LINE.
+SELECTION-SCREEN COMMENT 1(31) TEXT-K01.
+PARAMETERS : P_RBT0 RADIOBUTTON GROUP R1 DEFAULT 'X'.
+SELECTION-SCREEN COMMENT 35(8) TEXT-K02 FOR FIELD P_RBT0.
+
+PARAMETERS : P_RBT1 RADIOBUTTON GROUP R1 .
+SELECTION-SCREEN COMMENT 45(8) TEXT-K03 FOR FIELD P_RBT1.
+
+PARAMETERS : P_RBT2 RADIOBUTTON GROUP R1.
+SELECTION-SCREEN COMMENT 55(8) TEXT-K04 FOR FIELD P_RBT2.
+
+PARAMETERS : P_RBT3 RADIOBUTTON GROUP R1.
+SELECTION-SCREEN COMMENT 65(8) TEXT-K05 FOR FIELD P_RBT3.
+SELECTION-SCREEN END OF LINE.
+
+SELECT-OPTIONS : S_MATNR FOR ZPPG0150T-MATNR.
+SELECTION-SCREEN END OF BLOCK B1.
+
+SELECTION-SCREEN BEGIN OF BLOCK B2 WITH FRAME TITLE TEXT-S02.
+PARAMETERS: C_ADD AS CHECKBOX  .
+SELECTION-SCREEN END OF BLOCK B2.
+<font color ="#0000FF">*SELECTION-SCREEN FUNCTION KEY 1.</font>
+
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* INITIALIZATION</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+INITIALIZATION.
+  PERFORM INITIALIZATION.
+
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* AT SELECTION-SCREEN</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR P_SPMON.
+  PERFORM  SEARCH_HELP_SPMON.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR S_ZDEPT-LOW."2014.05.05
+  PERFORM  SEARCH_HELP_ZDEPT USING S_ZDEPT-LOW.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR S_ZDEPT-HIGH."2014.05.05
+  PERFORM  SEARCH_HELP_ZDEPT USING S_ZDEPT-HIGH.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR S_ARBPL-LOW.
+  PERFORM  SEARCH_HELP_ARBPL USING S_ARBPL-LOW.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR S_ARBPL-HIGH.
+  PERFORM  SEARCH_HELP_ARBPL USING S_ARBPL-HIGH.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR S_EQUNR-LOW.
+  PERFORM  SEARCH_HELP_EQUNR USING S_EQUNR-LOW.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR S_EQUNR-HIGH.
+  PERFORM  SEARCH_HELP_EQUNR USING S_EQUNR-HIGH.
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* START-OF-SELECTION</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+START-OF-SELECTION.
+  PERFORM CHECK_AUTH_WERKS USING P_WERKS.
+  PERFORM PROCESS_DATA USING SPACE.
+
+
+<font color ="#0000FF">************************************************************************</font>
+<font color ="#0000FF">*&      Module  PBO  OUTPUT</font>
+<font color ="#0000FF">************************************************************************</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  STATUS_0100  OUTPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+MODULE STATUS_0100 OUTPUT.
+  DATA : LT_EX_UCOMM      TYPE TABLE OF SY-UCOMM WITH HEADER LINE.
+  CLEAR: LT_EX_UCOMM, LT_EX_UCOMM[].
+
+<font color ="#0000FF">*    APPEND 'SAVE' TO LT_EX_UCOMM.</font>
+  SET PF-STATUS '0100' EXCLUDING LT_EX_UCOMM[].
+
+  DATA: L_TITLE TYPE SY-TITLE.
+  L_TITLE = SY-TITLE.
+  SET TITLEBAR  '0100' WITH L_TITLE.  "&
+
+ENDMODULE.                 " STATUS_0100  OUTPUT
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  PBO_0100  OUTPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+MODULE PBO_0100 OUTPUT.
+
+  IF GS_DCON1 IS INITIAL.
+    CREATE OBJECT GS_DCON1
+      EXPORTING
+        STYLE     = CL_GUI_CONTROL=&gt;WS_CHILD
+        REPID     = SY-CPROG
+        DYNNR     = SY-DYNNR
+        SIDE      = GS_DCON1-&gt;DOCK_AT_LEFT
+        LIFETIME  = CL_GUI_CONTROL=&gt;LIFETIME_IMODE
+        EXTENSION = 3000
+      EXCEPTIONS
+        OTHERS    = 1.
+    PERFORM ALV_GLOBAL_SPLITTER_OBJECT USING GS_DCON1 GS_GCON1 GS_GCON2 15.
+  ENDIF.
+
+
+<font color ="#0000FF">* ALV Title 설정</font>
+  PERFORM SET_ALV_TITLE TABLES GT_DOCUMENT.
+  PERFORM ALV_GLOBAL_CREATE_DOCUMENT TABLES GT_DOCUMENT
+                                  USING GO_CL_DD_DOCUMENT GS_GCON1.
+  PERFORM ALV_CREATE_OBJECT_GCON
+     TABLES &lt;GF_TABLE&gt;
+     USING  GRID1
+            GS_GCON2
+            'CON1'
+            '&lt;GF_TABLE&gt;'
+            ''.
+
+<font color ="#0000FF">*  PERFORM ALV_CREATE_OBJECT_ACON</font>
+<font color ="#0000FF">*      TABLES GT_DATA</font>
+<font color ="#0000FF">*      USING  GRID1</font>
+<font color ="#0000FF">*             GS_DCON1</font>
+<font color ="#0000FF">*             'CON1'</font>
+<font color ="#0000FF">*             'GT_DATA'</font>
+<font color ="#0000FF">*             ''.</font>
+ENDMODULE.                 " PBO_0100  OUTPUT
+
+
+
+<font color ="#0000FF">************************************************************************</font>
+<font color ="#0000FF">*&      Module  PAI  INPUT</font>
+<font color ="#0000FF">************************************************************************</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  EXIT_0100  INPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+MODULE EXIT_0100 INPUT.
+
+  CLEAR GV_OKCD.
+  GV_OKCD = GV_UCOM.
+  CLEAR GV_UCOM.
+
+  CASE GV_OKCD.
+
+    WHEN 'BACK' OR 'EXIT' OR 'CANC'.
+      LEAVE TO SCREEN 0.
+  ENDCASE.
+ENDMODULE.                 " EXIT_0100  INPUT
+
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Module  USER_COMMAND_0100  INPUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+MODULE USER_COMMAND_0100 INPUT.
+  CLEAR GV_OKCD.
+  GV_OKCD = GV_UCOM.
+  CLEAR GV_UCOM.
+
+  CASE GV_OKCD.
+  ENDCASE.
+ENDMODULE.                 " USER_COMMAND_0100  INPUT
+
+
+
+
+<font color ="#0000FF">*---------------------------------------------------------------------*</font>
+<font color ="#0000FF">* FORM  APPEND_HEADER</font>
+<font color ="#0000FF">*---------------------------------------------------------------------*</font>
+<font color ="#0000FF">* TEXT : ALV Field Category using Internal Table</font>
+<font color ="#0000FF">*---------------------------------------------------------------------*</font>
+FORM ALV_APPEND_HEADER USING PV_ITAB_NAME
+                               PV_STRUCTURE_NAME.
+
+  CLEAR : GT_FIELDCAT_H[], GT_FIELDCAT_H.
+  CLEAR : FIELDCAT, GV_COL_POS.
+  REFRESH FIELDCAT.
+  CLEAR GV_COL_POS.
+
+  "Internal Table에 대한 Field Catalog를 참조한다.
+  PERFORM ALV_FIELDCATALOG_CALL USING PV_ITAB_NAME
+                                      PV_STRUCTURE_NAME.
+
+  CASE PV_ITAB_NAME .
+    WHEN 'GT_DATA'. PERFORM SET_FIELDCAT_DATA .
+  ENDCASE.
+
+
+ENDFORM. "APPEND_HEADER
+
+
+
+
+<font color ="#0000FF">*---------------------------------------------------------------------*</font>
+<font color ="#0000FF">* FORM  ALV_INIT</font>
+<font color ="#0000FF">*---------------------------------------------------------------------*</font>
+<font color ="#0000FF">* TEXT : ALV Grid의 초기값을 설정한다.</font>
+<font color ="#0000FF">*---------------------------------------------------------------------*</font>
+FORM ALV_GRID_INIT USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+                          PV_CONS_NAME TYPE CHAR10.
+
+  "Layout Setting
+<font color ="#0000FF">*   gs_layout-cwidth_opt = 'X'.    "Column Width 최적화 사용여부</font>
+  GS_LAYOUT-NO_ROWMARK = ' '.
+  GS_LAYOUT-SEL_MODE   = 'D'.    "Row 선택유형
+<font color ="#0000FF">*   GS_LAYOUT-ZEBRA      = 'X'.</font>
+
+
+  GS_LAYOUT-NO_TOTLINE = 'X'.
+<font color ="#0000FF">*  GS_LAYOUT-NUMC_TOTAL = 'X'.</font>
+
+
+
+  "Layout Variant 속성 설정
+  CONCATENATE SY-REPID SY-DYNNR INTO GV_VARIANT-REPORT.
+  GV_SAVE = 'U'.
+
+
+  "Tollbar에서 제거할 버튼지정
+  PERFORM ALV_EXCLUDE_TB_FUNCTIONS USING PO_GRID.
+
+  PERFORM ALV_REGISTER_F4_FIELDS USING PO_GRID.
+
+  CALL METHOD PO_GRID-&gt;REGISTER_EDIT_EVENT
+    EXPORTING
+      I_EVENT_ID = CL_GUI_ALV_GRID=&gt;MC_EVT_MODIFIED.
+
+<font color ="#0000FF">* EVENT DEFINE</font>
+<font color ="#0000FF">*  CREATE OBJECT GS_EVENT_RECEIVER.</font>
+<font color ="#0000FF">*  SET HANDLER GS_EVENT_RECEIVER-&gt;HANDLE_SUBTOTAL_TEXT FOR PO_GRID.</font>
+<font color ="#0000FF">*  SET HANDLER GS_EVENT_RECEIVER-&gt;HANDLE_DATA_CHANGED  FOR PO_GRID.</font>
+<font color ="#0000FF">*   SET HANDLER GS_EVENT_RECEIVER-&gt;HANDLE_HOTSPOT_CLICK FOR PO_GRID.</font>
+<font color ="#0000FF">*   SET HANDLER GS_EVENT_RECEIVER-&gt;HANDLE_ONF4          FOR PO_GRID.</font>
+
+
+ENDFORM. "alv_init
+
+
+
+
+<font color ="#0000FF">*---------------------------------------------------------------------*</font>
+<font color ="#0000FF">* FORM  EXCLUDE_TB_FUNCTIONS</font>
+<font color ="#0000FF">*---------------------------------------------------------------------*</font>
+<font color ="#0000FF">* TEXT : ALV Toolbar에서 제외할 Button 설정</font>
+<font color ="#0000FF">*---------------------------------------------------------------------*</font>
+FORM ALV_EXCLUDE_TB_FUNCTIONS USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID.
+
+  CLEAR : GT_EXCLUDE, GT_EXCLUDE[].
+
+  "CL_GUI_ALV_GRID Class의 Static Attribute를 이용하여 Button을 제거한다.
+  "Button을 모두 제거하려면 CL_GUI_ALV_GRID=&gt;MC_FC_EXCL_ALL를 지정한다.
+
+  PERFORM APPEND_EXCLUDE_FUNCTIONS
+         TABLES GT_EXCLUDE[]
+          USING : CL_GUI_ALV_GRID=&gt;MC_FC_LOC_UNDO, " 실행취소 &LOCAL&UNDO
+                  CL_GUI_ALV_GRID=&gt;MC_FC_LOC_COPY,          " 행 카피.
+                  CL_GUI_ALV_GRID=&gt;MC_FC_REFRESH,
+                  CL_GUI_ALV_GRID=&gt;MC_FC_LOC_COPY_ROW,      " 행 카피.
+                  CL_GUI_ALV_GRID=&gt;MC_FC_LOC_CUT,           " 가위.
+                  CL_GUI_ALV_GRID=&gt;MC_FC_LOC_DELETE_ROW,    " 행삭제.
+                  CL_GUI_ALV_GRID=&gt;MC_FC_LOC_INSERT_ROW,    " 행삽입.
+                  CL_GUI_ALV_GRID=&gt;MC_FC_LOC_APPEND_ROW,    " 라인생성.
+                  CL_GUI_ALV_GRID=&gt;MC_FC_LOC_MOVE_ROW,
+                  CL_GUI_ALV_GRID=&gt;MC_FC_LOC_PASTE,         " 겹쳐쓰기.
+                  CL_GUI_ALV_GRID=&gt;MC_FC_LOC_PASTE_NEW_ROW. " 겹쳐쓰기.
+
+ENDFORM. " EXCLUDE_TB_FUNCTIONS
+
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  FORM  CREATE_OBJECT</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  TEXT : Container와 ALV Object를 생선한다.</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_CREATE_OBJECT_ACON
+      TABLES PT_OUTPUT
+      USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+            PO_CONS TYPE REF TO CL_GUI_DOCKING_CONTAINER
+            PV_CONS_NAME TYPE CHAR10
+            PV_IT_NAME
+            PV_STRUCTURE_NAME.
+
+  "Screen PBO Module에 의해서 실행된다.
+  IF PO_CONS IS INITIAL.   "Object가 아직 생성되지 않은 경우
+    "Container Object 생성
+
+    CREATE OBJECT PO_CONS
+      EXPORTING
+        STYLE     = CL_GUI_CONTROL=&gt;WS_CHILD
+        REPID     = SY-CPROG
+        DYNNR     = SY-DYNNR
+        SIDE      = PO_CONS-&gt;DOCK_AT_LEFT
+        LIFETIME  = CL_GUI_CONTROL=&gt;LIFETIME_IMODE
+        EXTENSION = 3000
+      EXCEPTIONS
+        OTHERS    = 1.
+
+    "ALV Grid Object 생성
+    CREATE OBJECT PO_GRID
+      EXPORTING
+        I_PARENT      = PO_CONS
+        I_APPL_EVENTS = 'X'.
+
+    PERFORM ALV_APPEND_HEADER USING PV_IT_NAME
+                                     PV_STRUCTURE_NAME.
+
+    PERFORM ALV_APPEND_SORT  USING PV_IT_NAME
+                                     PV_STRUCTURE_NAME.
+
+    PERFORM ALV_GRID_INIT USING PO_GRID
+                                 PV_CONS_NAME.
+
+
+
+    "ALV Grid를 출력한다.
+    CALL METHOD PO_GRID-&gt;SET_TABLE_FOR_FIRST_DISPLAY
+      EXPORTING
+        IS_LAYOUT            = GS_LAYOUT
+        IS_VARIANT           = GV_VARIANT
+        IT_TOOLBAR_EXCLUDING = GT_EXCLUDE
+        I_SAVE               = GV_SAVE
+        I_DEFAULT            = 'X'
+      CHANGING
+        IT_FIELDCATALOG      = FIELDCAT[]
+        IT_OUTTAB            = PT_OUTPUT[]
+        IT_SORT              = GT_SORT[]
+        IT_FILTER            = GT_FILTER[].
+
+
+  ELSE.       "Object가 이미 생성된 경우
+<font color ="#0000FF">*     PERFORM ALV_TABLE_REFRESH USING PO_GRID 'X' SPACE.</font>
+  ENDIF.
+
+ENDFORM. "CREATE_OBJECT
+
+
+
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* FORM  REGISTER_F4_FIELDS</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* TEXT : Search Help를 출력할 Field Name을 설정한다.</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_REGISTER_F4_FIELDS USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID.
+  DATA: LT_F4_DATA TYPE LVC_S_F4,
+        LT_F4      TYPE LVC_T_F4.
+
+<font color ="#0000FF">*   LT_F4_DATA-FIELDNAME   = 'KSTAR'.</font>
+<font color ="#0000FF">*   LT_F4_DATA-REGISTER    = 'X'.</font>
+<font color ="#0000FF">*   LT_F4_DATA-CHNGEAFTER  = 'X'.</font>
+<font color ="#0000FF">*   INSERT LT_F4_DATA INTO TABLE LT_F4.</font>
+
+  CALL METHOD PO_GRID-&gt;REGISTER_F4_FOR_FIELDS
+    EXPORTING
+      IT_F4 = LT_F4[].
+
+ENDFORM. " P3040_REGISTER_F4_FIELDS
+
+
+
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* FORM  P1220_FIELD$$SET</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* TEXT : 탐색 도움말 Field Setting</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_F4_FIELD_SET USING P_TABLE
+                                          P_FIELD
+                                          P_FLAG.
+  GT_FIELDS-TABNAME    = P_TABLE.
+  GT_FIELDS-FIELDNAME  = P_FIELD.
+  GT_FIELDS-SELECTFLAG = P_FLAG.
+  APPEND GT_FIELDS. CLEAR GT_FIELDS.
+
+ENDFORM. " P1220_FIELD$$SET
+
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV$$SET_FILTER</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text : 필터 정의</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_SET_FILTER .
+  CLEAR : GT_FILTER[].
+ENDFORM. " ALV$$SET_FILTER
+
+
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_FIELDCAT_BRAND_0100</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text : 브랜드 관련 FIELDCAT</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SET_FIELDCAT_DATA.
+  PERFORM ALV_FIELD_SETTING_CALL USING :
+                   'S'   'BUKRS'      SPACE    ,
+                   ' '   'SELTEXT_L'  TEXT-C01  ,
+                   'E'   'KEY'        'X',
+
+                   'S'   'WERKS_T'      SPACE  ,
+                   ' '   'SELTEXT_L'  TEXT-C02  ,
+                   'E'   'KEY'        ' ',
+
+                   'S'   'MATNR'      SPACE    ,
+                   ' '   'SELTEXT_L'  TEXT-C03  ,
+                   ' '   'CONVEXIT'   'ALPHA'  ,
+                   'E'   'KEY'        ' ',
+
+                   'S'   'MATNR_T'      SPACE  ,
+                   ' '   'SELTEXT_L'  TEXT-C04  ,
+                   'E'   'KEY'        ' ',
+
+                   'S'   'ICON'      SPACE     ,
+                   ' '   'SELTEXT_L'  TEXT-C05  ,
+                   ' '   'JUST'       'C',
+                   'E'   'KEY'        ' '.
+
+
+ENDFORM. "
+
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_SORT_DATA</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_PV_IT_NAME  text</font>
+<font color ="#0000FF">*      --&gt;P_PV_STRUCTURE_NAME  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SET_SORT_DATA.
+  PERFORM ALV_SORT_SETTING USING :
+
+                 'S' 'FIELDNAME' 'EQUNR_T',
+                 ' ' 'UP'        'X',
+                 ' ' 'SUBTOT'    ' ',
+                 'E' 'SPOS'      '6',
+
+                 'S' 'FIELDNAME' 'EQUNR',
+                 ' ' 'UP'        'X',
+                 ' ' 'SUBTOT'    'X',
+                 'E' 'SPOS'      '5',
+
+                 'S' 'FIELDNAME' 'ARBPL_T',
+                 ' ' 'UP'        'X',
+                 ' ' 'SUBTOT'    ' ',
+                 'E' 'SPOS'      '4',
+
+                 'S' 'FIELDNAME' 'ARBPL',
+                 ' ' 'UP'        'X',
+                 ' ' 'SUBTOT'    'X',
+                 'E' 'SPOS'      '3',
+                 'S' 'FIELDNAME' 'LOGRP',
+                 ' ' 'UP'        'X',
+                 ' ' 'SUBTOT'    'X',
+                 'E' 'SPOS'      '2',
+
+                 'S' 'FIELDNAME' 'ZDEPT',
+                 ' ' 'UP'        'X',
+                 ' ' 'SUBTOT'    'X',
+                 'E' 'SPOS'      '1'.
+
+ENDFORM. " SET_SORT_DATA
+
+
+
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* FORM  FIELD$$SET</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* TEXT : 탐색 도움말 Field Setting</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+
+
+
+
+FORM FIELD_SET TABLES PT_FIELDS STRUCTURE HELP_VALUE
+                 USING P_TABLE  P_FIELD P_FLAG.
+  PT_FIELDS-TABNAME    = P_TABLE.
+  PT_FIELDS-FIELDNAME  = P_FIELD.
+  PT_FIELDS-SELECTFLAG = P_FLAG.
+  APPEND PT_FIELDS. CLEAR PT_FIELDS.
+ENDFORM. " P2050_FIELD_SET
+
+
+
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  alv_append_sort</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;PV_ITAB_NAME       text</font>
+<font color ="#0000FF">*      --&gt;PV_STRUCTURE_NAME  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_APPEND_SORT USING PV_ITAB_NAME
+                                PV_STRUCTURE_NAME.
+  CLEAR : GT_SORT[], GT_SORT.
+
+  CASE PV_ITAB_NAME .
+    WHEN '&lt;GF_TABLE&gt;'. PERFORM SET_SORT_DATA.
+  ENDCASE.
+ENDFORM. " ALV_APPEND_SORT
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  ALV_CREATE_OBJECT_GCON</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_GT_DATA  text</font>
+<font color ="#0000FF">*      --&gt;P_GRID1  text</font>
+<font color ="#0000FF">*      --&gt;P_GS_GCON2  text</font>
+<font color ="#0000FF">*      --&gt;P_0065   text</font>
+<font color ="#0000FF">*      --&gt;P_0066   text</font>
+<font color ="#0000FF">*      --&gt;P_0067   text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_CREATE_OBJECT_GCON
+       TABLES PT_OUTPUT
+       USING PO_GRID TYPE REF TO CL_GUI_ALV_GRID
+             PO_CONS TYPE REF TO CL_GUI_CONTAINER
+             PV_CONS_NAME TYPE CHAR10
+             PV_IT_NAME
+             PV_STRUCTURE_NAME.
+
+  "Screen PBO Module에 의해서 실행된다.
+  IF PO_GRID IS INITIAL.   "Object가 아직 생성되지 않은 경우
+    "Container Object 생성
+
+    "ALV Grid Object 생성
+    CREATE OBJECT PO_GRID
+      EXPORTING
+        I_PARENT      = PO_CONS
+        I_APPL_EVENTS = 'X'.
+
+    "Field, Sort Catalog를 구성하고 ALV 초기값을 설정한다.
+    "APPEND_HEADER, APPEND_HEADER2 중 선택하여 사용
+<font color ="#0000FF">*    PERFORM ALV_APPEND_HEADER USING PV_IT_NAME</font>
+<font color ="#0000FF">*                                     PV_STRUCTURE_NAME.</font>
+
+
+<font color ="#0000FF">*</font>
+    PERFORM ALV_APPEND_SORT  USING PV_IT_NAME
+                                    PV_STRUCTURE_NAME.
+
+
+
+
+    PERFORM ALV_GRID_INIT USING PO_GRID
+                                 PV_CONS_NAME.
+
+
+
+<font color ="#0000FF">*    CALL METHOD PO_GRID-&gt;SET_READY_FOR_INPUT.</font>
+
+
+
+    "ALV Grid를 출력한다.
+    CALL METHOD PO_GRID-&gt;SET_TABLE_FOR_FIRST_DISPLAY
+      EXPORTING
+        IS_LAYOUT            = GS_LAYOUT
+        IS_VARIANT           = GV_VARIANT
+        IT_TOOLBAR_EXCLUDING = GT_EXCLUDE
+        I_SAVE               = GV_SAVE
+        I_DEFAULT            = 'X'
+      CHANGING
+        IT_FIELDCATALOG      = FIELDCAT[]
+        IT_OUTTAB            = PT_OUTPUT[]
+        IT_SORT              = GT_SORT[]
+        IT_FILTER            = GT_FILTER[].
+
+  ELSE.       "Object가 이미 생성된 경우
+<font color ="#0000FF">*    PERFORM ALV_TABLE_REFRESH USING PO_GRID 'X' SPACE.</font>
+  ENDIF.
+ENDFORM.                    "alv_create_object_gcon
+
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_ALV_TITLE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_GT_DOCUMENT  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+
+
+FORM SET_ALV_TITLE  TABLES   PT_DOC STRUCTURE GT_DOCUMENT.
+  REFRESH : PT_DOC.
+  DATA: LV_WERKS_T LIKE T001W-NAME1.
+<font color ="#0000FF">*  Title 내용</font>
+  CLEAR : PT_DOC.
+  PERFORM GET_WERKS_DESC USING P_WERKS
+           CHANGING LV_WERKS_T.
+  CONCATENATE TEXT-H01  ':'  P_WERKS  LV_WERKS_T
+  INTO PT_DOC-TEXT SEPARATED BY SPACE.
+  APPEND PT_DOC.
+
+<font color ="#0000FF">*  CASE R_YEAR.</font>
+<font color ="#0000FF">*    WHEN 'X'.</font>
+<font color ="#0000FF">*      CLEAR : PT_DOC.</font>
+<font color ="#0000FF">*      CONCATENATE TEXT-H03  ':'</font>
+<font color ="#0000FF">*      P_YEAR '.' '01' '~' P_YEAR  '.' '12'</font>
+<font color ="#0000FF">*      INTO PT_DOC-TEXT SEPARATED BY SPACE.</font>
+<font color ="#0000FF">*      APPEND PT_DOC.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    WHEN OTHERS.</font>
+<font color ="#0000FF">*      CLEAR : PT_DOC.</font>
+<font color ="#0000FF">*      CONCATENATE TEXT-H03  ':'</font>
+<font color ="#0000FF">*      P_MONTH+0(4) '.' P_MONTH+4(2) '~' GV_SPMON+0(4) '.' GV_SPMON+4(2)</font>
+<font color ="#0000FF">*     INTO PT_DOC-TEXT SEPARATED BY SPACE.</font>
+<font color ="#0000FF">*      APPEND PT_DOC.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  ENDCASE.</font>
+ENDFORM.                    " SET_ALV_TITLE
+
+
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  INITIALIZATION</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM INITIALIZATION .
+<font color ="#0000FF">*  DATA: LS_FUNCTXT TYPE SMP_DYNTXT.</font>
+<font color ="#0000FF">*  CLEAR LS_FUNCTXT.</font>
+<font color ="#0000FF">*  LS_FUNCTXT-ICON_ID    = ICON_XLS.</font>
+<font color ="#0000FF">*  LS_FUNCTXT-ICON_TEXT  = LS_FUNCTXT-QUICKINFO  = TEXT-F01.</font>
+<font color ="#0000FF">*  SSCRFIELDS-FUNCTXT_01 = LS_FUNCTXT.</font>
+  DATA: LV_WERKS LIKE MARC-WERKS.
+  GET PARAMETER ID 'WRK' FIELD LV_WERKS.
+  P_WERKS = LV_WERKS.
+ENDFORM.                    " INITIALIZATION
+
+
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  PROCESS_DATA</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_TYPE     text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM PROCESS_DATA  USING PV_TYPE.
+  DATA : LT_DATA LIKE TABLE OF GT_DATA WITH HEADER LINE.
+  DATA : LT_MBEW LIKE TABLE OF MBEW WITH HEADER LINE.
+  PERFORM CHECK_FIELD USING GV_ERROR.
+
+  CHECK GV_ERROR IS INITIAL.
+
+  PERFORM SET_RANGES TABLES R_SHIFT.
+<font color ="#0000FF">*Get data from ZPPG0150T</font>
+  PERFORM GET_DATA TABLES LT_DATA.
+<font color ="#0000FF">*Get MARC</font>
+<font color ="#0000FF">*  PERFORM GET_MARA TABLES LT_DATA.</font>
+<font color ="#0000FF">*  Description 조회</font>
+  PERFORM GET_DATA_DESCRIPTION TABLES LT_DATA.
+<font color ="#0000FF">* Get Department</font>
+  PERFORM GET_DEPARTMENT TABLES LT_DATA."2014.05.05
+
+<font color ="#0000FF">* Set Dynamic table</font>
+  PERFORM SET_DYNAMIC_TABLE TABLES LT_DATA.
+<font color ="#0000FF">* Get Price</font>
+  PERFORM GET_MBEW TABLES LT_DATA LT_MBEW.
+<font color ="#0000FF">* Get Sum</font>
+  PERFORM GET_SUM  TABLES LT_MBEW.
+
+  REFRESH : GT_DATA.
+  IF LT_DATA[] IS NOT INITIAL.
+    GT_DATA[] = LT_DATA[].
+    CALL SCREEN 0100.
+  ELSE.
+    IF PV_TYPE IS INITIAL.
+      MESSAGE I005.
+      LEAVE LIST-PROCESSING.
+    ENDIF.
+  ENDIF.
+ENDFORM.                    " PROCESS_DATA
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  HIDE_FIELD</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  MONTH_F4</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SEARCH_HELP_SPMON.
+  DATA: BEGIN OF LT_DYNPFIELDS OCCURS 1.
+          INCLUDE STRUCTURE DYNPREAD.
+  DATA: END   OF LT_DYNPFIELDS.
+  DATA: LV_RETURNCODE   LIKE SY-SUBRC,
+        LV_MONAT        LIKE ISELLIST-MONTH,
+        LV_HLP_REPID    LIKE SY-REPID.
+  FIELD-SYMBOLS: &lt;MF_FELD&gt;.
+
+<font color ="#0000FF">* Wert von Dynpro lesen</font>
+  GET CURSOR FIELD LT_DYNPFIELDS-FIELDNAME.
+  APPEND LT_DYNPFIELDS.
+  LV_HLP_REPID = SY-REPID.
+  DO 2 TIMES.
+    CALL FUNCTION 'DYNP_VALUES_READ'
+      EXPORTING
+        DYNAME               = LV_HLP_REPID
+        DYNUMB               = SY-DYNNR
+      TABLES
+        DYNPFIELDS           = LT_DYNPFIELDS
+      EXCEPTIONS
+        INVALID_ABAPWORKAREA = 01
+        INVALID_DYNPROFIELD  = 02
+        INVALID_DYNPRONAME   = 03
+        INVALID_DYNPRONUMMER = 04
+        INVALID_REQUEST      = 05
+        NO_FIELDDESCRIPTION  = 06
+        UNDEFIND_ERROR       = 07.
+    IF SY-SUBRC = 3.
+<font color ="#0000FF">*     Aktuelles Dynpro ist Wertemengenbild</font>
+      LV_HLP_REPID = SY-REPID.
+    ELSE.
+      READ TABLE LT_DYNPFIELDS INDEX 1.
+<font color ="#0000FF">*     Unterstriche durch Blanks ersetzen</font>
+      TRANSLATE LT_DYNPFIELDS-FIELDVALUE USING '_ '.
+      EXIT.
+    ENDIF.
+  ENDDO.
+  IF SY-SUBRC = 0.
+<font color ="#0000FF">*   Konvertierung ins interne Format</font>
+    CALL FUNCTION 'CONVERSION_EXIT_PERI_INPUT'
+      EXPORTING
+        INPUT         = LT_DYNPFIELDS-FIELDVALUE
+      IMPORTING
+        OUTPUT        = LV_MONAT
+      EXCEPTIONS
+        ERROR_MESSAGE = 1.
+    IF LV_MONAT IS INITIAL.
+<font color ="#0000FF">*     Monat ist initial =&gt; Vorschlagswert aus akt. Datum ableiten</font>
+      LV_MONAT = SY-DATLO(6).
+    ENDIF.
+    CALL FUNCTION 'POPUP_TO_SELECT_MONTH'
+      EXPORTING
+        ACTUAL_MONTH               = LV_MONAT
+      IMPORTING
+        SELECTED_MONTH             = LV_MONAT
+        RETURN_CODE                = LV_RETURNCODE
+      EXCEPTIONS
+        FACTORY_CALENDAR_NOT_FOUND = 01
+        HOLIDAY_CALENDAR_NOT_FOUND = 02
+        MONTH_NOT_FOUND            = 03.
+    IF SY-SUBRC = 0 AND LV_RETURNCODE = 0.
+<font color ="#0000FF">*     ASSIGN (LT_dynpfields-FIELDNAME) TO &lt;MF_FELD&gt;. " ==&gt;&gt; note 148804</font>
+<font color ="#0000FF">*     &lt;MF_FELD&gt; = LV_monat.</font>
+      CALL FUNCTION 'CONVERSION_EXIT_PERI_OUTPUT'
+        EXPORTING
+          INPUT  = LV_MONAT
+        IMPORTING
+          OUTPUT = LT_DYNPFIELDS-FIELDVALUE.
+      COLLECT LT_DYNPFIELDS.
+      CALL FUNCTION 'DYNP_VALUES_UPDATE'
+        EXPORTING
+          DYNAME               = LV_HLP_REPID
+          DYNUMB               = SY-DYNNR
+        TABLES
+          DYNPFIELDS           = LT_DYNPFIELDS
+        EXCEPTIONS
+          INVALID_ABAPWORKAREA = 01
+          INVALID_DYNPROFIELD  = 02
+          INVALID_DYNPRONAME   = 03
+          INVALID_DYNPRONUMMER = 04
+          INVALID_REQUEST      = 05
+          NO_FIELDDESCRIPTION  = 06
+          UNDEFIND_ERROR       = 07.           "&lt;&lt;== note 148804
+    ENDIF.
+  ENDIF.
+ENDFORM.                    " MONTH_F4
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_DATA</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_LT_DATA  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM GET_DATA  TABLES   PT_DATA STRUCTURE GT_DATA.
+  "Insert correct name for &lt;...&gt;.
+  FIELD-SYMBOLS: &lt;LF_WA&gt;  LIKE LINE OF GT_DATA.
+  DATA: LT_DATA LIKE TABLE OF GT_DATA WITH HEADER LINE.
+  PERFORM SET_R_BUDAT.
+
+  SELECT
+   IFSEQ
+   WERKS
+   ARBPL
+   EQUNR
+   LOGRP
+   VAART
+   MATNR
+   KUNNR
+   CHARG
+   BUDAT
+   ERFMG
+   MEINS
+
+   INTO CORRESPONDING FIELDS OF TABLE LT_DATA
+   FROM ZPPG0150T AS A
+   WHERE WERKS = P_WERKS
+   AND BUDAT IN R_BUDAT
+   AND ARBPL IN S_ARBPL
+   AND EQUNR IN S_EQUNR
+   AND LOGRP IN R_SHIFT
+   AND MATNR IN S_MATNR
+   AND MSTAT  = '6'.
+
+  LOOP AT LT_DATA ASSIGNING &lt;LF_WA&gt;.
+<font color ="#0000FF">*1.3)	Processing type 이 A1, A2인 데이터 가감 처리.</font>
+
+    CASE &lt;LF_WA&gt;-VAART.
+      WHEN 'A2'.
+        &lt;LF_WA&gt;-ERFMG = &lt;LF_WA&gt;-ERFMG * -1.
+    ENDCASE.
+    MOVE-CORRESPONDING &lt;LF_WA&gt; TO PT_DATA.
+    CLEAR:  PT_DATA-VAART.
+    CLEAR:  PT_DATA-IFSEQ.
+    CLEAR:  PT_DATA-KUNNR.
+    COLLECT PT_DATA.
+
+
+  ENDLOOP.
+ENDFORM.                    " GET_DATA
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_DATA_DESCRIPTION</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_LT_DATA  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM GET_DATA_DESCRIPTION  TABLES   PT_DATA STRUCTURE GT_DATA.
+  "Insert correct name for &lt;...&gt;.
+  DATA :
+         LTS_MATNR TYPE TABLE OF GY_SEARCH WITH HEADER LINE,
+         LTS_ARBPL TYPE TABLE OF GY_SEARCH WITH HEADER LINE,
+         LTS_EQUNR TYPE TABLE OF GY_SEARCH WITH HEADER LINE,
+         LT_MAKT   TYPE TABLE OF MAKT      WITH HEADER LINE,
+         LT_EQKT   TYPE TABLE OF EQKT      WITH HEADER LINE.
+  DATA: BEGIN OF LT_KTEXT OCCURS 0,
+         ARBPL LIKE CRHD-ARBPL,
+         KTEXT LIKE CRTX-KTEXT,
+        END OF LT_KTEXT.
+
+  CHECK PT_DATA[] IS NOT INITIAL.
+
+  LOOP AT PT_DATA.
+    LTS_MATNR-MATNR = PT_DATA-MATNR. COLLECT LTS_MATNR.
+    LTS_ARBPL-ARBPL = PT_DATA-ARBPL. COLLECT LTS_ARBPL.
+    LTS_EQUNR-EQUNR = PT_DATA-EQUNR. COLLECT LTS_EQUNR.
+  ENDLOOP.
+
+<font color ="#0000FF">*  Material</font>
+  PERFORM GET_MATNR_DESC_TABLE TABLES LTS_MATNR LT_MAKT.
+<font color ="#0000FF">*  Work Center</font>
+  PERFORM GET_ARBPL_DESC_TABLE_LO TABLES LTS_ARBPL LT_KTEXT.
+
+<font color ="#0000FF">*  Equipment Number</font>
+  PERFORM GET_EQUNR_DESC_TABLE TABLES LTS_EQUNR LT_EQKT.
+
+  LOOP AT PT_DATA.
+    $$READ_TABLE PT_DATA :
+                           MATNR MATNR_T  LT_MAKT  MATNR MAKTX,
+                           ARBPL ARBPL_T  LT_KTEXT ARBPL KTEXT,
+                           EQUNR EQUNR_T  LT_EQKT  EQUNR EQKTX.
+
+    MODIFY PT_DATA TRANSPORTING  MATNR_T ARBPL_T EQUNR_T.
+  ENDLOOP.
+
+ENDFORM.                    " GET_DATA_DESCRIPTION
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_DYNAMIC_TABLE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SET_DYNAMIC_TABLE TABLES PT_DATA STRUCTURE GT_DATA .
+  PERFORM SET_FIELDCAT.
+  PERFORM SET_EXTEND_FIELDCAT.
+  PERFORM CREATE_DYNAMIC_TABLE.
+  PERFORM MOVE_DATA_TO_DYNAMIC_TABLE TABLES PT_DATA.
+ENDFORM.                    " SET_DYNAMIC_TABLE
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_FIELDCAT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SET_FIELDCAT .
+  $SET_DEFAULT:
+<font color ="#0000FF">*      C_ZDEPT1        '',</font>
+<font color ="#0000FF">*      C_LOGRP1        '',</font>
+<font color ="#0000FF">*      C_ARBPL1        '',</font>
+<font color ="#0000FF">*      C_EQUNR1        '',</font>
+<font color ="#0000FF">*      C_MATNR1        '',</font>
+<font color ="#0000FF">*</font>
+      C_ZDEPT        TEXT-C11, "2014.05.05
+      C_LOGRP        TEXT-C05, "2014.05.05
+      C_ARBPL        TEXT-C01,
+      C_ARBPL_T      TEXT-C02,
+      C_EQUNR        TEXT-C03,
+      C_EQUNR_T      TEXT-C04,
+      C_MATNR        TEXT-C06,
+      C_MATNR_T      TEXT-C07,
+      C_CHARG        TEXT-C08.
+
+  PERFORM CLEAR_GV_FIELD_INDEX.
+
+  DO GV_PERIOD TIMES.
+
+    GV_PER+3       = GV_FIELD_INDEX.
+    "00/00
+    $SET_FIELDTEXT_DATE: GV_PER_T    GV_FIELD_INDEX.
+    $SET_DEFAULT:   GV_PER  GV_PER_T  .
+
+    PERFORM SET_GV_FIELD_INDEX USING GV_FIELD_INDEX '1'.
+
+  ENDDO.
+
+  $SET_DEFAULT:
+      C_SUM       TEXT-C09,
+      C_STPRS     TEXT-C10,
+      C_MEINS         '',
+      C_WAERS         ''.
+
+
+
+
+
+ENDFORM.                    " SET_FIELDCAT
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_GV_FIELD_INDEX</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_GV_FIELD_INDEX  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SET_GV_FIELD_INDEX  USING    PV_FIELD_INDEX  PV_PERIOD.
+
+  PV_FIELD_INDEX  =  PV_FIELD_INDEX + PV_PERIOD.
+
+ENDFORM.                    " SET_GV_FIELD_INDEX
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_EXTEND_FIELDCAT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SET_EXTEND_FIELDCAT .
+
+  PERFORM CLEAR_GV_FIELD_INDEX.
+  $SET_KEY:
+                C_ZDEPT, "2014.05.05
+                C_LOGRP, "2014.05.05
+                C_ARBPL,
+                C_ARBPL_T,
+                C_EQUNR,
+                C_EQUNR_T,
+                C_MATNR,
+                C_MATNR_T,
+                C_CHARG.
+
+  $SET_COL_OPT:
+                C_ZDEPT, "2014.05.05
+                C_LOGRP,
+                C_ARBPL,
+                C_ARBPL_T,
+                C_EQUNR,
+                C_EQUNR_T,
+                C_MATNR,
+                C_MATNR_T,
+                C_CHARG.
+
+  $SET_OUTLEN:  C_SUM   '12',
+                C_STPRS '12'.
+
+  $SET_NO_ZERO: C_SUM, C_STPRS.
+
+  $SET_JUST:     C_SUM    'R',
+                 C_STPRS  'R'.
+
+  $SET_NO_OUT:
+
+<font color ="#0000FF">*                C_ZDEPT1,</font>
+<font color ="#0000FF">*                C_LOGRP1,</font>
+<font color ="#0000FF">*                C_ARBPL1,</font>
+<font color ="#0000FF">*                C_EQUNR1,</font>
+<font color ="#0000FF">*                C_MATNR1,</font>
+                C_MEINS.
+
+
+  $SET_EMPHASIZE: C_SUM   'C310',
+                  C_STPRS 'C310'.
+  $SET_DO_SUM:    C_SUM, C_STPRS.
+  $SET_JUST: C_SUM  'R'.
+
+  $SET_REF_TABLE: C_SUM    'ZPPG0150T',
+                  C_WAERS  'T001',
+                  C_STPRS  'MBEW'.
+  $SET_REF_FIELD: C_SUM    'ERFMG',
+                  C_WAERS  'WAERS',
+                  C_STPRS  'STPRS'.
+
+
+  $SET_QFIELDNAME: C_SUM   'MEINS'.
+  $SET_CFIELDNAME: C_STPRS 'WAERS'.
+
+
+  $SET_NO_OUT: "
+                C_MEINS , C_WAERS.
+  IF C_ADD IS INITIAL.
+    $SET_NO_OUT: C_STPRS.
+  ENDIF.
+
+  $SET_REF_TABLE:
+                  C_ZDEPT     'ZPPG0064T',"2014.05.05
+                  C_ARBPL     'CRHD',
+                  C_ARBPL_T   'CRTX',
+                  C_EQUNR     'ZPPG0063T',
+                  C_EQUNR_T   'ZPPG0063T',
+                  C_MATNR     'MARA',
+                  C_MATNR_T   'MAKT',
+                  C_STPRS     'MBEW'.
+<font color ="#0000FF">*                  C_MATNR1    'MARA',</font>
+<font color ="#0000FF">*                  C_EQUNR1    'ZPPG0063T',</font>
+<font color ="#0000FF">*                  C_ARBPL1    'CRHD',</font>
+<font color ="#0000FF">*                  C_LOGRP1    'ZPPG0150T',</font>
+<font color ="#0000FF">*                  C_ZDEPT1    'ZPPG0064T'.</font>
+
+  $SET_REF_FIELD:
+                  C_ZDEPT     'ZDEPT',"2014.05.05
+                  C_ARBPL     'ARBPL',
+                  C_ARBPL_T   'KTEXT',
+                  C_EQUNR     'ZMACN',
+                  C_EQUNR_T   'ZTEXT',
+                  C_MATNR     'MATNR',
+                  C_MATNR_T   'MAKTX',
+                  C_STPRS     'STPRS'.
+<font color ="#0000FF">*                  C_MATNR1    'MATNR',</font>
+<font color ="#0000FF">*                  C_EQUNR1    'ZMACN',</font>
+<font color ="#0000FF">*                  C_ARBPL1    'ARBPL',</font>
+<font color ="#0000FF">*                  C_LOGRP1    'LOGRP',</font>
+<font color ="#0000FF">*                  C_ZDEPT1    'ZDEPT'."2014.05.05</font>
+
+
+  DO GV_PERIOD TIMES.
+
+    GV_PER+3       = GV_FIELD_INDEX.
+
+<font color ="#0000FF">*    $SET_EDIT: GV_PER.</font>
+
+    $SET_DO_SUM: GV_PER.
+
+    $SET_NO_ZERO: GV_PER.
+
+    $SET_JUST: GV_PER  'R'.
+
+    $SET_REF_TABLE: GV_PER  'ZPPG0150T'.
+
+    $SET_REF_FIELD: GV_PER  'ERFMG'.
+
+    $SET_OUTLEN: GV_PER '12'.
+
+    $SET_QFIELDNAME: GV_PER 'MEINS'.
+
+    PERFORM SET_GV_FIELD_INDEX USING GV_FIELD_INDEX  '1'.
+
+  ENDDO.
+
+ENDFORM.                    " SET_EXTEND_FIELDCAT
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  CLEAR_GV_FIELD_INDEX</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM CLEAR_GV_FIELD_INDEX .
+  CLEAR: GV_FIELD_INDEX.
+  READ TABLE R_BUDAT INDEX 1.
+  GV_FIELD_INDEX = R_BUDAT-LOW.
+
+ENDFORM.                    " CLEAR_GV_FIELD_INDEX
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  CREATE_DYNAMIC_TABLE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM CREATE_DYNAMIC_TABLE .
+  CALL METHOD CL_ALV_TABLE_CREATE=&gt;CREATE_DYNAMIC_TABLE
+    EXPORTING
+      IT_FIELDCATALOG = FIELDCAT[]
+    IMPORTING
+      EP_TABLE        = GV_DY_TABLE.
+
+
+  ASSIGN GV_DY_TABLE-&gt;* TO &lt;GF_TABLE&gt;.
+
+  CREATE DATA GV_DY_LINE LIKE LINE OF &lt;GF_TABLE&gt;.
+  ASSIGN GV_DY_LINE-&gt;* TO &lt;GF_WA&gt;.
+
+ENDFORM.                    " CREATE_DYNAMIC_TABLE
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  MOVE_DATA_TO_DYNAMIC_TABLE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM MOVE_DATA_TO_DYNAMIC_TABLE TABLES PT_DATA STRUCTURE GT_DATA.
+  DATA: LV_MIX TYPE STRING.
+  DATA: LV_FLAG.
+  DATA: LS_FIELDCAT LIKE LINE OF FIELDCAT.
+  FIELD-SYMBOLS: &lt;LF_FIELD&gt;, &lt;LF_FIELD2&gt;.
+
+  SORT PT_DATA BY ZDEPT LOGRP ARBPL EQUNR MATNR  CHARG.
+  LOOP AT PT_DATA .
+
+    CLEAR: LV_MIX.
+    CONCATENATE C_T_PER  PT_DATA-BUDAT
+    INTO LV_MIX.
+
+    $ASSIGN_FIELD_VALUE: LV_MIX   PT_DATA-ERFMG.
+
+    $ASSIGN_FIELD_VALUE:
+<font color ="#0000FF">*    C_T_ZDEPT1    PT_DATA-ZDEPT, "2014.05.05</font>
+<font color ="#0000FF">*    C_T_LOGRP1    PT_DATA-LOGRP,</font>
+<font color ="#0000FF">*    C_T_ARBPL1    PT_DATA-ARBPL,</font>
+<font color ="#0000FF">*    C_T_EQUNR1    PT_DATA-EQUNR,</font>
+<font color ="#0000FF">*    C_T_MATNR1    PT_DATA-MATNR,</font>
+
+    C_T_ZDEPT    PT_DATA-ZDEPT, "2014.05.05
+    C_T_ARBPL    PT_DATA-ARBPL,
+    C_T_ARBPL_T  PT_DATA-ARBPL_T,
+    C_T_EQUNR    PT_DATA-EQUNR,
+    C_T_EQUNR_T  PT_DATA-EQUNR_T,
+    C_T_LOGRP    PT_DATA-LOGRP,
+    C_T_MATNR    PT_DATA-MATNR,
+    C_T_MATNR_T  PT_DATA-MATNR_T,
+
+    C_T_CHARG    PT_DATA-CHARG,
+    C_T_MEINS    PT_DATA-MEINS.
+    COLLECT &lt;GF_WA&gt; INTO &lt;GF_TABLE&gt;.
+    CLEAR &lt;GF_WA&gt;.
+    CLEAR LV_FLAG.
+  ENDLOOP.
+ENDFORM.                    " MOVE_DATA_TO_DYNAMIC_TABLE
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_R_PERXX</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SET_R_BUDAT .
+
+  DATA: LV_LOW  LIKE SY-DATUM.
+  DATA: LV_HIGH LIKE SY-DATUM.
+
+  $$CLEAR: R_BUDAT.
+  IF S_BUDAT[] IS INITIAL.
+    CONCATENATE P_SPMON '01' INTO LV_LOW.
+
+    PERFORM GET_LAST_DAY_OF_MONTHS USING LV_LOW
+                                   CHANGING LV_HIGH.
+
+    $$APPEND_RANGES: R_BUDAT 'I' 'BT'  LV_LOW  LV_HIGH.
+
+  ELSE.
+    R_BUDAT[] = S_BUDAT[].
+    LV_LOW  = S_BUDAT-LOW.
+    LV_HIGH = S_BUDAT-HIGH.
+    IF LV_HIGH IS INITIAL.
+      PERFORM GET_LAST_DAY_OF_MONTHS USING LV_LOW
+                               CHANGING LV_HIGH.
+
+    ENDIF.
+  ENDIF.
+
+  GV_PERIOD = LV_HIGH - LV_LOW  + 1.
+ENDFORM.                    " SET_R_PERXX
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  CHANGE_DATA</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_ALV_EDIT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_GV_FLAG_DISPLAY  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SET_ALV_EDIT  USING    PV_FLAG_DISPLAY.
+<font color ="#0000FF">*  DATA: LS_FIELDCAT LIKE LINE OF FIELDCAT.</font>
+<font color ="#0000FF">*  ASSIGN (C_T_CELLTAB) TO &lt;GF_CELLTAB&gt;.</font>
+<font color ="#0000FF">*  CLEAR &lt;GF_CELLTAB&gt;.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  LOOP AT FIELDCAT INTO LS_FIELDCAT.</font>
+<font color ="#0000FF">*    FIND 'PER' IN  LS_FIELDCAT-FIELDNAME.</font>
+<font color ="#0000FF">*    IF SY-SUBRC = 0.</font>
+<font color ="#0000FF">*      ASSIGN (C_T_CELLTAB) TO &lt;GF_CELLTAB&gt;.</font>
+<font color ="#0000FF">*      $SET_STYLE: LS_FIELDCAT-FIELDNAME  PV_FLAG_DISPLAY .</font>
+<font color ="#0000FF">*      UNASSIGN : &lt;GF_CELLTAB&gt; .</font>
+<font color ="#0000FF">*    ENDIF.</font>
+<font color ="#0000FF">*  ENDLOOP.</font>
+
+ENDFORM.                    " SET_ALV_EDIT
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  RUN_CHANGE_BAPI</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM RUN_CHANGE_BAPI .
+  DATA: LV_MSG TYPE STRING.
+  DATA: LV_MIX TYPE STRING.
+  DATA:
+  LV_MATERIAL LIKE  BAPISITEMR-MATERIAL,
+  LV_PLANT  LIKE  BAPISITEMR-PLANT,
+  LV_REQUIREMENTSTYPE LIKE  BAPISITEMR-REQU_TYPE,
+  LV_VERSION  LIKE  BAPISITEMR-VERSION,
+  LV_REQMTSPLANNUMBER LIKE  BAPISITEMR-REQ_NUMBER,
+  LV_VERS_ACTIV LIKE  BAPISITEMR-VERS_ACTIV,
+  LT_REQUIREMENTS_SCHEDULE_IN	LIKE TABLE OF	BAPISSHDIN
+  WITH HEADER LINE,
+  LT_RETURN	LIKE TABLE OF BAPIRETURN1
+  WITH HEADER LINE.
+  FIELD-SYMBOLS: &lt;LF_FIELD&gt;.
+
+  ASSIGN COMPONENT 'MATNR' OF STRUCTURE
+  &lt;GF_WA&gt; TO &lt;LF_FIELD&gt;.
+  LV_MATERIAL          = &lt;LF_FIELD&gt;.
+  UNASSIGN &lt;LF_FIELD&gt;.
+
+  ASSIGN COMPONENT 'WERKS' OF STRUCTURE
+ &lt;GF_WA&gt; TO &lt;LF_FIELD&gt;.
+  LV_PLANT             = &lt;LF_FIELD&gt;.
+  UNASSIGN &lt;LF_FIELD&gt;.
+
+  LV_REQUIREMENTSTYPE  = 'VSF'.
+
+  ASSIGN COMPONENT 'VERSB' OF STRUCTURE
+ &lt;GF_WA&gt; TO &lt;LF_FIELD&gt;.
+  LV_VERSION           = &lt;LF_FIELD&gt;.
+  UNASSIGN &lt;LF_FIELD&gt;.
+<font color ="#0000FF">* LV_REQMTSPLANNUMBER</font>
+  LV_VERS_ACTIV  = 'X'.
+<font color ="#0000FF">*1  Day</font>
+<font color ="#0000FF">*2  Week</font>
+<font color ="#0000FF">*3  Month</font>
+<font color ="#0000FF">*4  Posting period</font>
+<font color ="#0000FF">*5  Planning calendar period</font>
+  ASSIGN COMPONENT 'ENTLI' OF STRUCTURE
+ &lt;GF_WA&gt; TO &lt;LF_FIELD&gt;.
+  LT_REQUIREMENTS_SCHEDULE_IN-DATE_TYPE  = &lt;LF_FIELD&gt;.
+  UNASSIGN &lt;LF_FIELD&gt;.
+  ASSIGN COMPONENT 'MEINS' OF STRUCTURE
+ &lt;GF_WA&gt; TO &lt;LF_FIELD&gt;.
+  LT_REQUIREMENTS_SCHEDULE_IN-UNIT       = &lt;LF_FIELD&gt;.
+  UNASSIGN &lt;LF_FIELD&gt;.
+<font color ="#0000FF">*LT_REQUIREMENTS_SCHEDULE_IN-BOMEXPL</font>
+  LT_REQUIREMENTS_SCHEDULE_IN-PROD_VES   = LV_VERSION.
+
+  PERFORM CLEAR_GV_FIELD_INDEX.
+
+  DO GV_PERIOD TIMES.
+
+    GV_T_PER+11       = GV_FIELD_INDEX.
+    ASSIGN (GV_T_PER) TO &lt;LF_FIELD&gt;.
+    IF SY-SUBRC = 0.
+
+
+      LT_REQUIREMENTS_SCHEDULE_IN-REQ_QTY    = &lt;LF_FIELD&gt;.
+      UNASSIGN &lt;LF_FIELD&gt;.
+
+      CONCATENATE GV_FIELD_INDEX '01' INTO LV_MIX.
+      LT_REQUIREMENTS_SCHEDULE_IN-REQ_DATE   = LV_MIX.
+
+    ENDIF.
+    APPEND LT_REQUIREMENTS_SCHEDULE_IN.
+    PERFORM SET_GV_FIELD_INDEX USING GV_FIELD_INDEX '1'.
+
+  ENDDO.
+
+
+  CALL FUNCTION 'BAPI_REQUIREMENTS_CHANGE'
+    EXPORTING
+      MATERIAL                       = LV_MATERIAL
+      PLANT                          = LV_PLANT
+      REQUIREMENTSTYPE               = LV_REQUIREMENTSTYPE
+      VERSION                        = LV_VERSION
+      REQMTSPLANNUMBER               = LV_REQMTSPLANNUMBER
+      VERS_ACTIV                     = LV_VERS_ACTIV
+      DO_COMMIT                      = 'X'
+      UPDATE_MODE                    = 'X'
+      DELETE_OLD                     = ' '
+<font color ="#0000FF">*   NO_WITHDR                      = ' '</font>
+<font color ="#0000FF">* IMPORTING</font>
+<font color ="#0000FF">*   REQUIREMENT_ITEM_OUT           =</font>
+    TABLES
+     REQUIREMENTS_SCHEDULE_IN       = LT_REQUIREMENTS_SCHEDULE_IN
+     RETURN                         = LT_RETURN.
+
+  IF LT_RETURN[] IS INITIAL.
+    CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+      EXPORTING
+        WAIT = 'X'.
+    ASSIGN COMPONENT 'ICON' OF STRUCTURE
+   &lt;GF_WA&gt; TO &lt;LF_FIELD&gt;.
+    &lt;LF_FIELD&gt; = ICON_LED_GREEN.
+    UNASSIGN &lt;LF_FIELD&gt;.
+  ELSE.
+
+    PERFORM MAKE_MESSAGE_TABLE_1 TABLES LT_RETURN CHANGING LV_MSG.
+    ASSIGN COMPONENT 'MSG' OF STRUCTURE
+    &lt;GF_WA&gt; TO &lt;LF_FIELD&gt;.
+    &lt;LF_FIELD&gt; = LV_MSG.
+    UNASSIGN &lt;LF_FIELD&gt;.
+
+    ASSIGN COMPONENT 'ICON' OF STRUCTURE
+   &lt;GF_WA&gt; TO &lt;LF_FIELD&gt;.
+    &lt;LF_FIELD&gt; = ICON_LED_RED.
+    UNASSIGN &lt;LF_FIELD&gt;.
+
+  ENDIF.
+
+ENDFORM.                    " RUN_CHANGE_BAPI
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  CALL_TRANSACTION_MD63</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  MAKE_CREATE_BDC_TABLE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_LT_BDCDATA  text</font>
+<font color ="#0000FF">*      --&gt;P_LS_DATA  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_RANGES</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_R_SHIFT  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SET_RANGES  TABLES   P_SHIFT STRUCTURE  R_SHIFT.
+  "Insert correct name for &lt;...&gt;.
+  $$CLEAR: P_SHIFT.
+  IF P_RBT1 = 'X'.
+    $$APPEND_RANGES: P_SHIFT 'I' 'EQ' '1' ''.
+  ENDIF.
+
+  IF P_RBT2 = 'X'.
+    $$APPEND_RANGES: P_SHIFT 'I' 'EQ' '2' ''.
+  ENDIF.
+
+  IF P_RBT3 = 'X'.
+    $$APPEND_RANGES: P_SHIFT 'I' 'EQ' '3' ''.
+  ENDIF.
+
+ENDFORM.                    " SET_RANGES
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_EQUNR_DESC_TABLE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_LTS_EQUNR  text</font>
+<font color ="#0000FF">*      --&gt;P_LT_EQKT  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM GET_EQUNR_DESC_TABLE  TABLES PT_IN PT_OUT.
+  DATA : LT_IN  TYPE TABLE OF EQKT WITH HEADER LINE,
+         LT_OUT TYPE TABLE OF EQKT WITH HEADER LINE.
+
+  CHECK PT_IN[] IS NOT INITIAL.
+<font color ="#0000FF">*  LOOP AT PT_IN.</font>
+<font color ="#0000FF">*    MOVE-CORRESPONDING PT_IN TO LT_IN.</font>
+<font color ="#0000FF">*    APPEND LT_IN.</font>
+<font color ="#0000FF">*  ENDLOOP.</font>
+
+  SELECT ZMACN AS EQUNR
+         ZTEXT AS EQKTX
+     INTO CORRESPONDING FIELDS OF TABLE LT_OUT
+     FROM ZPPG0063T
+    WHERE WERKS = P_WERKS.
+
+  SORT LT_OUT BY EQUNR.
+  DELETE ADJACENT DUPLICATES FROM LT_OUT
+  COMPARING EQUNR.
+  REFRESH : PT_OUT.
+  LOOP AT LT_OUT.
+    CLEAR : PT_OUT.
+    MOVE-CORRESPONDING LT_OUT TO PT_OUT.
+    APPEND PT_OUT.
+  ENDLOOP.
+ENDFORM.                    " GET_EQUNR_DESC_TABLE
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_MARC</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_LT_DATA  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM GET_MARA  TABLES   PT_DATA STRUCTURE GT_DATA.
+  "Insert correct name for &lt;...&gt;.
+<font color ="#0000FF">*FIELD-SYMBOLS: &lt;LF_WA&gt; LIKE LINE OF GT_DATA.</font>
+<font color ="#0000FF">*DATA: LT_DATA LIKE TABLE OF GT_DATA WITH HEADER LINE.</font>
+<font color ="#0000FF">*DATA: LT_MARA LIKE TABLE OF MARA WITH HEADER LINE.</font>
+<font color ="#0000FF">*CHECK PT_DATA[] IS NOT INITIAL.</font>
+<font color ="#0000FF">*LT_DATA[]  = PT_DATA[].</font>
+<font color ="#0000FF">*SORT LT_DATA BY MATNR.</font>
+<font color ="#0000FF">*DELETE ADJACENT DUPLICATES FROM LT_DATA</font>
+<font color ="#0000FF">*COMPARING MATNR.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*SELECT MATNR MTART</font>
+<font color ="#0000FF">*  FROM MARA</font>
+<font color ="#0000FF">*  INTO CORRESPONDING FIELDS OF TABLE LT_MARA</font>
+<font color ="#0000FF">*  FOR ALL ENTRIES IN LT_DATA</font>
+<font color ="#0000FF">*  WHERE MATNR = LT_DATA-MATNR.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*SORT LT_MARA BY MATNR.</font>
+<font color ="#0000FF">*LOOP AT PT_DATA ASSIGNING &lt;LF_WA&gt;.</font>
+<font color ="#0000FF">* READ TABLE LT_MARA WITH KEY</font>
+<font color ="#0000FF">* MATNR  = &lt;LF_WA&gt;-MATNR.</font>
+<font color ="#0000FF">* IF SY-SUBRC = 0.</font>
+<font color ="#0000FF">*   &lt;LF_WA&gt;-MTART = LT_MARA-MTART.</font>
+<font color ="#0000FF">*  ENDIF.</font>
+<font color ="#0000FF">*ENDLOOP.</font>
+ENDFORM.                    " GET_MARC
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_SUM</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM GET_SUM  TABLES PT_MBEW STRUCTURE MBEW.
+  FIELD-SYMBOLS :&lt;LF_SUM&gt;, &lt;LF_FIELD&gt;, &lt;LF_MATNR&gt;,
+                 &lt;LF_STPRS&gt;.
+  DATA: LV_MIX TYPE STRING.
+  DATA: LV_STPRS LIKE MBEW-STPRS.
+  DATA: LV_WAERS LIKE T001-WAERS.
+  SELECT SINGLE WAERS INTO LV_WAERS
+    FROM T001
+    WHERE BUKRS = P_WERKS.
+
+  SORT PT_MBEW BY MATNR.
+  LOOP AT &lt;GF_TABLE&gt; ASSIGNING &lt;GF_WA&gt;.
+    ASSIGN COMPONENT 'MATNR' OF STRUCTURE &lt;GF_WA&gt;
+    TO &lt;LF_MATNR&gt;.
+    IF SY-SUBRC  = 0.
+      CLEAR: LV_STPRS.
+      READ TABLE PT_MBEW WITH KEY MATNR = &lt;LF_MATNR&gt;
+      BINARY SEARCH.
+      IF SY-SUBRC = 0.
+
+        LV_STPRS = PT_MBEW-STPRS.
+      ENDIF.
+    ENDIF.
+    ASSIGN COMPONENT 'SUM' OF  STRUCTURE &lt;GF_WA&gt;
+    TO &lt;LF_SUM&gt;.
+    IF SY-SUBRC = 0.
+      PERFORM CLEAR_GV_FIELD_INDEX.
+
+      DO GV_PERIOD TIMES.
+
+        CONCATENATE C_T_PER  GV_FIELD_INDEX
+        INTO LV_MIX.
+        IF SY-SUBRC = 0.
+          ASSIGN (LV_MIX) TO &lt;LF_FIELD&gt;.
+          &lt;LF_SUM&gt; = &lt;LF_SUM&gt; + &lt;LF_FIELD&gt;.
+        ENDIF.
+        PERFORM SET_GV_FIELD_INDEX USING GV_FIELD_INDEX '1'.
+
+
+      ENDDO.
+      ASSIGN COMPONENT 'STPRS' OF STRUCTURE &lt;GF_WA&gt;
+     TO &lt;LF_STPRS&gt;.
+
+      &lt;LF_STPRS&gt; = LV_STPRS * &lt;LF_SUM&gt;.
+      ASSIGN COMPONENT 'WAERS' OF STRUCTURE &lt;GF_WA&gt;
+     TO &lt;LF_FIELD&gt;.
+      &lt;LF_FIELD&gt; = LV_WAERS.
+
+
+      UNASSIGN &lt;LF_SUM&gt;.
+      UNASSIGN &lt;LF_STPRS&gt;.
+    ENDIF.
+  ENDLOOP.
+ENDFORM.                    " GET_SUM
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_MBEW</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_LT_DATA  text</font>
+<font color ="#0000FF">*      --&gt;P_LT_MBEW  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM GET_MBEW  TABLES   PT_DATA STRUCTURE GT_DATA
+                          "Insert correct name for &lt;...&gt;
+                        PT_MBEW STRUCTURE MBEW.
+  DATA: LT_DATA LIKE TABLE OF GT_DATA WITH HEADER LINE.
+  CHECK PT_DATA[] IS NOT INITIAL.
+  LT_DATA[]  = PT_DATA[].
+  SORT LT_DATA BY MATNR.
+  DELETE ADJACENT DUPLICATES FROM LT_DATA
+  COMPARING MATNR.
+
+  SELECT MATNR STPRS
+    FROM MBEW
+    INTO CORRESPONDING FIELDS OF TABLE PT_MBEW
+    FOR ALL ENTRIES IN LT_DATA
+    WHERE MATNR = LT_DATA-MATNR
+      AND BWKEY = P_WERKS
+      AND LVORM &lt;&gt; 'X'.
+
+
+ENDFORM.                    " GET_MBEW
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SEARCH_HELP_ARBPL</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_S_ARBPL_HIGH  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SEARCH_HELP_ARBPL  USING    PV_ARBPL.
+
+  DATA : LT_0150 TYPE TABLE OF ZPPG0150T WITH HEADER LINE.
+  DATA: BEGIN OF LT_HELP OCCURS 0,
+          ARBPL LIKE ZPPG0150T-ARBPL,
+          KTEXT LIKE CRTX-KTEXT,
+        END OF LT_HELP.
+
+  DATA: LT_RETURN LIKE DDSHRETVAL OCCURS 0 WITH HEADER LINE.
+
+  DATA : LV_VALUE(10) TYPE C.
+
+
+  PERFORM DYNPRO_VALUE_READ USING : 'P_WERKS' P_WERKS.
+
+
+  SELECT ARBPL
+    INTO CORRESPONDING FIELDS OF TABLE LT_0150
+    FROM ZPPG0150T
+   WHERE WERKS EQ P_WERKS
+   .
+
+  CHECK SY-SUBRC EQ 0.
+
+  SORT LT_0150 BY ARBPL.
+  DELETE ADJACENT DUPLICATES FROM LT_0150
+  COMPARING ARBPL.
+  SELECT  A~KTEXT  B~ARBPL
+       INTO CORRESPONDING FIELDS OF TABLE LT_HELP
+        FROM ( CRTX AS A  INNER JOIN CRHD AS B
+                       ON A~OBJID = B~OBJID )
+        FOR ALL ENTRIES IN LT_0150
+        WHERE  B~ARBPL EQ LT_0150-ARBPL
+        AND  A~SPRAS = SY-LANGU.
+
+
+
+  CALL FUNCTION 'F4IF_INT_TABLE_VALUE_REQUEST'
+    EXPORTING
+      RETFIELD     = 'ARBPL'
+      DYNPPROG     = SY-CPROG
+      DYNPNR       = SY-DYNNR
+      WINDOW_TITLE = TEXT-T03
+      VALUE_ORG    = 'S'
+    TABLES
+      VALUE_TAB    = LT_HELP
+      RETURN_TAB   = LT_RETURN.
+
+  READ TABLE LT_RETURN INDEX 1.
+  CHECK SY-SUBRC EQ 0.
+  REPLACE ALL OCCURRENCES OF ':' IN LT_RETURN-FIELDVAL WITH ''.
+  PV_ARBPL = LT_RETURN-FIELDVAL.
+
+
+ENDFORM.                    " SEARCH_HELP_ARBPL
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SEARCH_HELP_EQUNR</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_S_EQUNR_LOW  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SEARCH_HELP_EQUNR  USING    PV_EQUNR.
+
+
+  DATA : LT_0150 TYPE TABLE OF ZPPG0150T WITH HEADER LINE.
+  DATA: BEGIN OF LT_HELP OCCURS 0,
+          EQUNR LIKE ZPPG0150T-EQUNR,
+<font color ="#0000FF">*          EQKTX LIKE EQKT-EQKTX,</font>
+        END OF LT_HELP.
+
+  DATA: LT_RETURN LIKE DDSHRETVAL OCCURS 0 WITH HEADER LINE.
+
+  DATA : LV_VALUE(10) TYPE C.
+
+
+  PERFORM DYNPRO_VALUE_READ USING : 'P_WERKS' P_WERKS.
+
+
+  SELECT EQUNR
+    INTO CORRESPONDING FIELDS OF TABLE LT_0150
+    FROM ZPPG0150T
+   WHERE WERKS EQ P_WERKS
+   .
+
+  CHECK SY-SUBRC EQ 0.
+
+  LOOP AT LT_0150.
+    CLEAR LT_HELP.
+    MOVE-CORRESPONDING LT_0150 TO LT_HELP.
+    COLLECT LT_HELP.
+  ENDLOOP.
+<font color ="#0000FF">*  SELECT EQUNR EQKTX</font>
+<font color ="#0000FF">*     INTO CORRESPONDING FIELDS OF TABLE LT_HELP</font>
+<font color ="#0000FF">*     FROM EQKT</font>
+<font color ="#0000FF">*      FOR ALL ENTRIES IN LT_0150</font>
+<font color ="#0000FF">*    WHERE EQUNR EQ LT_0150-EQUNR</font>
+<font color ="#0000FF">*      AND SPRAS EQ SY-LANGU.</font>
+
+
+
+  CALL FUNCTION 'F4IF_INT_TABLE_VALUE_REQUEST'
+    EXPORTING
+      RETFIELD     = 'EQUNR'
+      DYNPPROG     = SY-CPROG
+      DYNPNR       = SY-DYNNR
+      WINDOW_TITLE = TEXT-T03
+      VALUE_ORG    = 'S'
+    TABLES
+      VALUE_TAB    = LT_HELP
+      RETURN_TAB   = LT_RETURN.
+
+  READ TABLE LT_RETURN INDEX 1.
+  CHECK SY-SUBRC EQ 0.
+  REPLACE ALL OCCURRENCES OF ':' IN LT_RETURN-FIELDVAL WITH ''.
+  PV_EQUNR = LT_RETURN-FIELDVAL.
+
+ENDFORM.                    " SEARCH_HELP_EQUNR
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  CHECK_FIELD</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_GV_ERROR  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM CHECK_FIELD  USING    PV_ERROR.
+  CLEAR PV_ERROR.
+  IF S_BUDAT-LOW IS NOT INITIAL.
+    IF S_BUDAT-LOW+0(6)  &lt;&gt; P_SPMON.
+      PV_ERROR = 'X'.
+      MESSAGE S000 WITH TEXT-M01 DISPLAY LIKE 'E'.
+    ENDIF.
+  ENDIF.
+  IF S_BUDAT-HIGH IS NOT INITIAL.
+    IF S_BUDAT-HIGH+0(6)  &lt;&gt; P_SPMON.
+      PV_ERROR = 'X'.
+      MESSAGE S000 WITH TEXT-M01 DISPLAY LIKE 'E'.
+    ENDIF.
+  ENDIF.
+
+ENDFORM.                    " CHECK_FIELD
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SEARCH_HELP_ZDEPT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_S_ZDEPT_LOW  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM SEARCH_HELP_ZDEPT  USING    PV_ZDEPT.
+  DATA: BEGIN OF LT_HELP OCCURS 0,
+          ZDEPT LIKE ZPPG0065T-ZDEPT,
+        END OF LT_HELP.
+
+  DATA: LT_RETURN LIKE DDSHRETVAL OCCURS 0 WITH HEADER LINE.
+
+  DATA : LV_VALUE(10) TYPE C.
+
+
+  PERFORM DYNPRO_VALUE_READ USING : 'P_WERKS' P_WERKS.
+
+
+  SELECT ZDEPT
+    INTO CORRESPONDING FIELDS OF TABLE LT_HELP
+    FROM ZPPG0065T
+   WHERE WERKS EQ P_WERKS
+   .
+
+  CHECK SY-SUBRC EQ 0.
+
+
+
+
+  CALL FUNCTION 'F4IF_INT_TABLE_VALUE_REQUEST'
+    EXPORTING
+      RETFIELD     = 'ZDEPT'
+      DYNPPROG     = SY-CPROG
+      DYNPNR       = SY-DYNNR
+      WINDOW_TITLE = TEXT-T03
+      VALUE_ORG    = 'S'
+    TABLES
+      VALUE_TAB    = LT_HELP
+      RETURN_TAB   = LT_RETURN.
+
+  READ TABLE LT_RETURN INDEX 1.
+  CHECK SY-SUBRC EQ 0.
+  REPLACE ALL OCCURRENCES OF ':' IN LT_RETURN-FIELDVAL WITH ''.
+  PV_ZDEPT = LT_RETURN-FIELDVAL.
+
+
+ENDFORM.                    " SEARCH_HELP_ZDEPT
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_DEPARTMENT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_LT_DATA  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM GET_DEPARTMENT  TABLES   PT_DATA STRUCTURE GT_DATA.
+  DATA: LT_0064 LIKE TABLE OF ZPPG0064T WITH HEADER LINE.
+  DATA: LT_DATA LIKE TABLE OF GT_DATA WITH HEADER LINE.
+  FIELD-SYMBOLS : &lt;LF_WA&gt; LIKE LINE OF GT_DATA.
+  LT_DATA[] = PT_DATA[].
+  SORT LT_DATA BY WERKS ARBPL EQUNR.
+  DELETE ADJACENT DUPLICATES FROM LT_DATA
+  COMPARING WERKS ARBPL EQUNR.
+  CHECK LT_DATA[] IS NOT INITIAL.
+
+  SELECT * FROM ZPPG0064T
+    INTO CORRESPONDING FIELDS OF TABLE LT_0064
+    FOR ALL ENTRIES IN LT_DATA
+    WHERE WERKS = LT_DATA-WERKS
+    AND   ARBPL = LT_DATA-ARBPL
+    AND   ZMACN = LT_DATA-EQUNR.
+
+  LOOP AT PT_DATA ASSIGNING &lt;LF_WA&gt;.
+    READ TABLE LT_0064 WITH KEY
+    WERKS = &lt;LF_WA&gt;-WERKS
+    ARBPL = &lt;LF_WA&gt;-ARBPL
+    ZMACN = &lt;LF_WA&gt;-EQUNR.
+    IF SY-SUBRC = 0.
+
+      &lt;LF_WA&gt;-ZDEPT = LT_0064-ZDEPT.
+
+    ENDIF.
+
+  ENDLOOP.
+
+  IF S_ZDEPT[] IS NOT INITIAL.
+    DELETE PT_DATA WHERE ZDEPT NOT IN S_ZDEPT.
+  ENDIF.
+ENDFORM.                    " GET_DEPARTMENT
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* FORM  ALV_SUBTOTAL_TEXT</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* TEXT : ALV SUBTOTAL_TEXT변경 처리.</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM ALV_SUBTOTAL_TEXT USING  PO_SENDER TYPE REF TO CL_GUI_ALV_GRID
+                              PS_SUBTOTTXT_INFO TYPE LVC_S_STXT
+                              P_SUBTOT_LINE TYPE REF TO DATA
+                              P_EVENT_DATA TYPE REF TO CL_ALV_EVENT_DATA .
+
+<font color ="#0000FF">*  FIELD-SYMBOLS: &lt;FS&gt; TYPE ANY.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  ASSIGN P_EVENT_DATA-&gt;M_DATA-&gt;* TO &lt;FS&gt;.</font>
+<font color ="#0000FF">*  &lt;FS&gt; = 'TOTAL'(027).</font>
+ENDFORM. "ALV_subtotal_text
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_ARBPL_DESC_TABLE_LO</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;PT_IN      text</font>
+<font color ="#0000FF">*      --&gt;PT_OUT     text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM GET_ARBPL_DESC_TABLE_LO  TABLES  PT_IN PT_OUT.
+  DATA: BEGIN OF LT_IN OCCURS 0,
+         ARBPL LIKE CRHD-ARBPL,
+         KTEXT LIKE CRTX-KTEXT,
+        END OF LT_IN.
+
+  DATA : LT_OUT LIKE TABLE OF LT_IN WITH HEADER LINE.
+
+  CHECK PT_IN[] IS NOT INITIAL.
+  LOOP AT PT_IN.
+    MOVE-CORRESPONDING PT_IN TO LT_IN.
+    APPEND LT_IN.
+  ENDLOOP.
+  SELECT  A~KTEXT  B~ARBPL
+       INTO CORRESPONDING FIELDS OF TABLE LT_OUT
+        FROM ( CRTX AS A  INNER JOIN CRHD AS B
+                       ON A~OBJID = B~OBJID )
+        FOR ALL ENTRIES IN LT_IN
+        WHERE  B~ARBPL EQ LT_IN-ARBPL
+        AND  B~WERKS EQ P_WERKS
+        AND  A~SPRAS = SY-LANGU.
+
+  SORT LT_OUT BY ARBPL.
+  REFRESH : PT_OUT.
+  LOOP AT LT_OUT.
+    CLEAR : PT_OUT.
+    MOVE-CORRESPONDING LT_OUT TO PT_OUT.
+    APPEND PT_OUT.
+  ENDLOOP.
+ENDFORM.                    " GET_ARBPL_DESC_TABLE
+
+<font color ="#0000FF">*GUI Texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* 0100 --&gt; &1</font>
+
+<font color ="#0000FF">*Text elements</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* C01 Work Center</font>
+<font color ="#0000FF">* C02 Work Center Desc.</font>
+<font color ="#0000FF">* C03 Machine</font>
+<font color ="#0000FF">* C04 Machine Desc.</font>
+<font color ="#0000FF">* C05 Shift</font>
+<font color ="#0000FF">* C06 Material</font>
+<font color ="#0000FF">* C07 Material Description</font>
+<font color ="#0000FF">* C08 Batch</font>
+<font color ="#0000FF">* C09 Total</font>
+<font color ="#0000FF">* C10 Total Amount</font>
+<font color ="#0000FF">* C11 Department</font>
+<font color ="#0000FF">* H01 Plant</font>
+<font color ="#0000FF">* K01 Shift</font>
+<font color ="#0000FF">* K02 ALL</font>
+<font color ="#0000FF">* K03 1shift</font>
+<font color ="#0000FF">* K04 2shift</font>
+<font color ="#0000FF">* K05 3shift</font>
+<font color ="#0000FF">* M01 Check Date Field.</font>
+<font color ="#0000FF">* S01 Selection Options</font>
+<font color ="#0000FF">* S02 Additional</font>
+
+
+<font color ="#0000FF">*Selection texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* C_ADD         Add Amount</font>
+<font color ="#0000FF">* P_RBT0         ALL</font>
+<font color ="#0000FF">* P_RBT1         1Shift</font>
+<font color ="#0000FF">* P_RBT2         2Shift</font>
+<font color ="#0000FF">* P_RBT3         3Shift</font>
+<font color ="#0000FF">* P_SPMON         Year/Month</font>
+<font color ="#0000FF">* P_WERKS D       .</font>
+<font color ="#0000FF">* S_ARBPL D       .</font>
+<font color ="#0000FF">* S_BUDAT         Date</font>
+<font color ="#0000FF">* S_EQUNR         Machine</font>
+<font color ="#0000FF">* S_MATNR D       .</font>
+<font color ="#0000FF">* S_ZDEPT D       .</font>
+
+
+<font color ="#0000FF">*Messages</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: 00</font>
+<font color ="#0000FF">*001   &1&2&3&4&5&6&7&8</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: PT_RETURN-ID</font>
+<font color ="#0000FF">*PT_</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: Z00CAM</font>
+<font color ="#0000FF">*004</font>
+<font color ="#0000FF">*020</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: ZCAGM</font>
+<font color ="#0000FF">*001   &</font>
+<font color ="#0000FF">*002   & &</font>
+<font color ="#0000FF">*012   Yes</font>
+<font color ="#0000FF">*013   No</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: ZCOEMSG</font>
+<font color ="#0000FF">*002</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: ZPPGM</font>
+<font color ="#0000FF">*000   & & & &</font>
+<font color ="#0000FF">*005   No Data!</font>
+
+<font color ="#0000FF">*GUI Texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* 0100 --&gt; SCREEN</font>
+
+
+<font color ="#0000FF">*Selection texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* P_SPMON D       .</font>
+<font color ="#0000FF">* P_WERKS D       .</font>
+<font color ="#0000FF">* S_ARBPL D       .</font>
+<font color ="#0000FF">* S_BUDAT D       .</font>
+<font color ="#0000FF">* S_EQUNR D       .</font>
+<font color ="#0000FF">* S_MATNR D       .</font>
+<font color ="#0000FF">* S_ZDEPT D       .</font>
+
+
+<font color ="#0000FF">*Messages</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: 00</font>
+<font color ="#0000FF">*001   &1&2&3&4&5&6&7&8</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: PT_RETURN-ID</font>
+<font color ="#0000FF">*PT_</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: Z00CAM</font>
+<font color ="#0000FF">*004</font>
+<font color ="#0000FF">*020</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: ZCAGM</font>
+<font color ="#0000FF">*001</font>
+<font color ="#0000FF">*002</font>
+<font color ="#0000FF">*012</font>
+<font color ="#0000FF">*013</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: ZCOEMSG</font>
+<font color ="#0000FF">*002</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: ZPPGM</font>
+<font color ="#0000FF">*000</font>
+<font color ="#0000FF">*005   No Data!</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZEDR13_03</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZEDR13_03</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Program ZEDR13_03</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report ZEDR13_03</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT ZEDR13_03.
+
+DATA : gs_data LIKE sflight,
+      gt_data LIKE TABLE OF sflight.
+
+CLEAR : gt_data,gs_data.
+
+SELECT CARRID CONNID FLDATE PRICE CURRENCY PLANETYPE
+  INTO CORRESPONDING FIELDS OF TABLE gt_data
+  FROM sflight
+  WHERE CARRID = 'AZ'.
+
+
+
+LOOP AT gt_data INTO gs_data.
+WRITE :
+gs_data-CARRID,
+gs_data-CONNID,
+gs_data-FLDATE,
+gs_data-PRICE,
+gs_data-CURRENCY,
+gs_data-PLANETYPE,/.
+ENDLOOP.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

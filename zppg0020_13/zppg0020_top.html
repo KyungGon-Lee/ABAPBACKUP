@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZPPG0020_TOP</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZPPG0020_TOP</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZPPG0020_TOP</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Include ZPPG0020_TOP                                      Report ZPPG0020</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT ZPPG0020 MESSAGE-ID oo.
+
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZLJW_TOP</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+TABLES: SSCRFIELDS.    "선택화면의 필드
+
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* IT & STRUCTURE</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+
+<font color ="#0000FF">* MAIN IT</font>
+DATA: BEGIN OF GT_M OCCURS 0,
+        MATNR         LIKE MAST-MATNR,
+        MATNR_T       LIKE MAKT-MAKTX,
+        WERKS         LIKE MAST-WERKS,
+        STLAN         LIKE MAST-STLAN,
+        STLNR         LIKE MAST-STLNR,
+        STLAL         LIKE MAST-STLAL,
+        DATUV         LIKE STPO-DATUV,
+        BMENG         LIKE STKO-BMENG,
+        BMEIN         LIKE STKO-BMEIN,
+        POSNR         LIKE STPO-POSNR,"PEPSI
+        POSTP         LIKE STPO-POSTP,
+        IDNRK         LIKE STPO-IDNRK,
+        IDNRK_T       LIKE MAKT-MAKTX,
+        MENGE         LIKE STPO-MENGE,
+        MEINS         LIKE STPO-MEINS,
+        ITSOB         LIKE STPO-ITSOB,
+        SANKA         LIKE STPO-SANKA,
+        BEIKZ         LIKE STPO-BEIKZ,
+        LGORT         LIKE STPO-LGORT,
+        STS_ICO       LIKE ICON-ID,
+        STS_MSG(255),
+        BDC_MSG      TYPE BDCMSGCOLL OCCURS 0,
+        MARK.
+DATA: END OF GT_M.
+DATA: GS_M LIKE LINE OF GT_M. "PEPSI
+<font color ="#0000FF">* 업로드 양식</font>
+DATA: BEGIN OF GT_XLS OCCURS 0,
+        MATNR(50),
+        MATNR_T(50),
+        WERKS(50),
+        STLAN(50),
+        STLAL(50),
+        DATUV(50),
+        BMENG(50),
+        POSNR(50)," PEPSI
+        POSTP(50),
+        IDNRK(50),
+        IDNRK_T(50),
+        MENGE(50),
+        MEINS(50),
+        ITSOB(50),
+        SANKA(50),
+        BEIKZ(50),
+        LGORT(50),
+      END OF GT_XLS.
+<font color ="#0000FF">** PEPSI START</font>
+DATA: GV_EXCEL_SUCCESS      LIKE SY-TABIX,
+      GV_EXCEL_FAIL         TYPE SY-TABIX,
+      GV_EXCEL_TOTAL        TYPE SY-TABIX,
+      GV_PROCESSING_SUCCESS TYPE SY-TABIX,
+      GV_PROCESSING_FAIL    TYPE SY-TABIX,
+      GV_PROCESSING_TOTAL   TYPE SY-TABIX,
+      GV_INDEX_NOW     TYPE I,
+      GV_INDEX_LAST    TYPE I,
+      GV_ERROR(8)      TYPE N, " 실패건수
+      GV_OK(8)         TYPE N, " 성공건수
+      GV_COUNT(8)      TYPE N.   "
+
+" BOM BAPI 를 위한 선언. PEPSI
+DATA :GT_BOMGROUP  LIKE BAPI1080_BGR_C OCCURS 0 WITH HEADER LINE,
+      GT_VARIANTS  LIKE BAPI1080_BOM_C OCCURS 0 WITH HEADER LINE,
+      GT_ITEMS     LIKE BAPI1080_ITM_C OCCURS 0 WITH HEADER LINE,
+      GT_MATERIALRELATIONS  LIKE BAPI1080_MBM_C
+      OCCURS 0 WITH HEADER LINE,
+      GT_ITEMASSIGNMENTS    LIKE BAPI1080_REL_ITM_BOM_C
+      OCCURS 0 WITH HEADER LINE,
+      GT_RETURN    LIKE BAPIRET2 OCCURS 0 WITH HEADER LINE.
+<font color ="#0000FF">* CHANGE BOM</font>
+DATA:GT_MESSAGES         LIKE MESSAGES OCCURS 0 WITH HEADER LINE.
+
+DATA : GT_T_STPO        LIKE STPO_API02 OCCURS 0 WITH HEADER LINE,
+       GT_T_DEP_DATA    LIKE CSDEP_DAT  OCCURS 0 WITH HEADER LINE,
+       GT_T_DEP_DESCR   LIKE CSDEP_DESC OCCURS 0 WITH HEADER LINE ,
+       GT_T_DEP_ORDER   LIKE CSDEP_ORD  OCCURS 0 WITH HEADER LINE,
+       GT_T_DEP_SOURCE  LIKE CSDEP_SORC OCCURS 0 WITH HEADER LINE,
+       GT_T_DEP_DOC     LIKE CSDEP_DOC  OCCURS 0 WITH HEADER LINE,
+       GT_O_STKO        LIKE STKO_API02 OCCURS 0 WITH HEADER LINE,
+       GT_FL_WARNING    LIKE CAPIFLAG-FLWARNING
+       OCCURS 0 WITH HEADER LINE.
+DATA:  GS_MBOM          LIKE CSAP_MBOM,
+       GS_STKO          LIKE STKO_API01,   "
+       GV_WARNING       LIKE CAPIFLAG-FLWARNING, "
+       GS_STKO_OUT      LIKE STKO_API02,
+       GT_STPO          LIKE STPO_API03 OCCURS 0 WITH HEADER LINE,
+       GT_STPU_API01    LIKE STPU_API01 OCCURS 0 WITH HEADER LINE."
+
+"BDC
+DATA :GT_BDCDATA LIKE BDCDATA    OCCURS 0 WITH HEADER LINE,
+      GT_MESSTAB LIKE BDCMSGCOLL OCCURS 0 WITH HEADER LINE,
+      GV_MSEG    LIKE SY-MSGV1,
+      GV_OPT     LIKE CTU_PARAMS.
+DATA: GV_MATNR   LIKE MARA-MATNR.
+
+<font color ="#0000FF">** PEPSI END</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">* 광역변수</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+DATA: G_OKCD  LIKE SY-UCOMM,
+      G_UCOM  LIKE SY-UCOMM,
+      G_ERROR.
+
+
+<font color ="#0000FF">* 자체 선언</font>
+
+DATA : gv_okcode    TYPE sy-ucomm,
+       gwk_filename TYPE localfile.
+<font color ="#0000FF">*       go_handler   TYPE REF TO lcl_evnet_handler.</font>
+DATA pa_path.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZVERS_DUMMY_13</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZVERS_DUMMY_13</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Program ZVERS_DUMMY_13</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report ZVERS_DUMMY_13</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT ZVERS_DUMMY_13.
+
+DATA : BEGIN OF GT_DATA OCCURS 0,
+  MATNR TYPE MARA-MATNR,
+  MAKTX TYPE MAKT-MAKTX,
+  END OF GT_DATA.
+
+  DATA : GT_MAKT TYPE TABLE OF MAKT,
+        GS_MAKT LIKE LINE OF GT_MAKT.
+
+<font color ="#0000FF">*-- 임의 데이터 2개 입력</font>
+GT_DATA-MATNR = 'COFMK-100'.
+APPEND GT_DATA.
+
+GT_DATA-MATNR = 'COMP105'.
+APPEND GT_DATA.
+
+IF GT_DATA[] IS NOT INITIAL. "인터널 테이블 비어있지 않을 경우로 조건을 정함
+  SORT GT_DATA BY MATNR. "MATNR2가 있으면 MATNR MATNR2. 이렇게 하면됨
+
+  DELETE ADJACENT DUPLICATES FROM GT_DATA COMPARING MATNR. " 비교하는 컬럼 조건으로 지움 (자재 번호 같은거 중에서 첫번쨰 남기고 다 지움)
+                                                           " 만약 두개 조건 걸고 싶으면 MATNR MAKTX. 이렇게 하면 됨
+                                                           " ALL FIELDS 하면 모든 칼럼임
+SELECT MATNR MAKTX
+INTO CORRESPONDING FIELDS OF TABLE GT_MAKT
+FROM MAKT
+FOR ALL ENTRIES IN GT_DATA " 비어있으면 풀 스캔을 함
+WHERE MATNR = GT_DATA-MATNR
+  AND SPRAS = 3.
+
+  SORT GT_MAKT BY MATNR.
+ENDIF.
+
+
+LOOP AT GT_DATA.
+
+  READ TABLE GT_MAKT INTO GS_MAKT WITH KEY MATNR = GT_DATA-MATNR
+                                  BINARY SEARCH.
+  IF SY-SUBRC = 0.
+    GT_DATA-MAKTX = GS_MAKT-MAKTX.
+
+    MODIFY GT_DATA.
+  ENDIF.
+
+ENDLOOP.
+
+<font color ="#0000FF">*-- DISPLAY</font>
+LOOP AT GT_DATA.
+  WRITE :/ GT_DATA-MATNR, GT_DATA-MAKTX.
+ENDLOOP.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>
